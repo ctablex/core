@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-### [0.4.0](https://github.com/sahabpardaz/ctablex/compare/v0.3.0...v0.4.0) (2022-10-16)
+### [0.4.0](https://github.com/ctablex/core/compare/v0.3.0...v0.4.0) (2022-10-16)
 
 ### Highlights
 
@@ -27,47 +27,47 @@ return <Row trEl={<MyTr className="zebra" />} />;
 
 ### Features
 
-- add and use table elements context ([#63](https://github.com/sahabpardaz/ctablex/issues/63)) ([0441555](https://github.com/sahabpardaz/ctablex/commit/0441555b21e0412a631a072eb0535363232ec5ff))
-- add children context ([#62](https://github.com/sahabpardaz/ctablex/issues/62)) ([f39f6ca](https://github.com/sahabpardaz/ctablex/commit/f39f6ca10229615d06112cd051de1e9046ef2fdf))
-- **row:** add and use CurrentRowDataProvider component ([#46](https://github.com/sahabpardaz/ctablex/issues/46)) ([5ad330b](https://github.com/sahabpardaz/ctablex/commit/5ad330b1d96155cea227a0cd831e9e21aee1c2c9))
+- add and use table elements context ([#63](https://github.com/ctablex/core/issues/63)) ([0441555](https://github.com/ctablex/core/commit/0441555b21e0412a631a072eb0535363232ec5ff))
+- add children context ([#62](https://github.com/ctablex/core/issues/62)) ([f39f6ca](https://github.com/ctablex/core/commit/f39f6ca10229615d06112cd051de1e9046ef2fdf))
+- **row:** add and use CurrentRowDataProvider component ([#46](https://github.com/ctablex/core/issues/46)) ([5ad330b](https://github.com/ctablex/core/commit/5ad330b1d96155cea227a0cd831e9e21aee1c2c9))
 
 ### Examples
 
-- **multipart:** add multipart example ([#57](https://github.com/sahabpardaz/ctablex/issues/57)) ([20ae64c](https://github.com/sahabpardaz/ctablex/commit/20ae64c9f17f9b853392873d5205e740f3769caa))
-- rename example directory names ([#52](https://github.com/sahabpardaz/ctablex/issues/52)) ([53f1a22](https://github.com/sahabpardaz/ctablex/commit/53f1a22b6b8fb1486313e6c114ab58554165d797))
+- **multipart:** add multipart example ([#57](https://github.com/ctablex/core/issues/57)) ([20ae64c](https://github.com/ctablex/core/commit/20ae64c9f17f9b853392873d5205e740f3769caa))
+- rename example directory names ([#52](https://github.com/ctablex/core/issues/52)) ([53f1a22](https://github.com/ctablex/core/commit/53f1a22b6b8fb1486313e6c114ab58554165d797))
 
-## [0.3.0](https://github.com/sahabpardaz/ctablex/compare/v0.2.1...v0.3.0) (2020-12-20)
+## [0.3.0](https://github.com/ctablex/core/compare/v0.2.1...v0.3.0) (2020-12-20)
 
 ### Features
 
-- add default children to table/table-body/table-header/row/rows components ([#29](https://github.com/sahabpardaz/ctablex/issues/29)) ([7091f5f](https://github.com/sahabpardaz/ctablex/commit/7091f5fb389e21e635752167556a2a6127fd1d97))
-- **columns:** add part props in columns usage ([#27](https://github.com/sahabpardaz/ctablex/issues/27)) ([1de25ca](https://github.com/sahabpardaz/ctablex/commit/1de25ca6e52771caa22ee735164fcff534233970))
-- accept and pass props to underlying components ([#28](https://github.com/sahabpardaz/ctablex/issues/28)) ([d672f4d](https://github.com/sahabpardaz/ctablex/commit/d672f4d914f5a1b7ce5c0480e782dc33550782fe))
+- add default children to table/table-body/table-header/row/rows components ([#29](https://github.com/ctablex/core/issues/29)) ([7091f5f](https://github.com/ctablex/core/commit/7091f5fb389e21e635752167556a2a6127fd1d97))
+- **columns:** add part props in columns usage ([#27](https://github.com/ctablex/core/issues/27)) ([1de25ca](https://github.com/ctablex/core/commit/1de25ca6e52771caa22ee735164fcff534233970))
+- accept and pass props to underlying components ([#28](https://github.com/ctablex/core/issues/28)) ([d672f4d](https://github.com/ctablex/core/commit/d672f4d914f5a1b7ce5c0480e782dc33550782fe))
 
 ### Examples
 
-- **complex-content:** add complex content example ([#25](https://github.com/sahabpardaz/ctablex/issues/25)) ([7553c57](https://github.com/sahabpardaz/ctablex/commit/7553c57f57f29e29e146c4795ff9f93fc414dd37))
+- **complex-content:** add complex content example ([#25](https://github.com/ctablex/core/issues/25)) ([7553c57](https://github.com/ctablex/core/commit/7553c57f57f29e29e146c4795ff9f93fc414dd37))
 
 ### Documentations
 
-- update readme and use new api ([#30](https://github.com/sahabpardaz/ctablex/issues/30)) ([494dab0](https://github.com/sahabpardaz/ctablex/commit/494dab029130c27be2cbcc56944ad770479327a1))
+- update readme and use new api ([#30](https://github.com/ctablex/core/issues/30)) ([494dab0](https://github.com/ctablex/core/commit/494dab029130c27be2cbcc56944ad770479327a1))
 
-### [0.2.1](https://github.com/sahabpardaz/ctablex/compare/v0.2.0...v0.2.1) (2020-07-19)
+### [0.2.1](https://github.com/ctablex/core/compare/v0.2.0...v0.2.1) (2020-07-19)
 
 ### Features
 
-- **columns:** support multi part tables ([#23](https://github.com/sahabpardaz/ctablex/issues/23)) ([be0152a](https://github.com/sahabpardaz/ctablex/commit/be0152aa65816b70887751a1421cb9c8464dbc58))
+- **columns:** support multi part tables ([#23](https://github.com/ctablex/core/issues/23)) ([be0152a](https://github.com/ctablex/core/commit/be0152aa65816b70887751a1421cb9c8464dbc58))
 
 ### Bug Fixes
 
-- **content-value:** support missing value ([#22](https://github.com/sahabpardaz/ctablex/issues/22)) ([66ee464](https://github.com/sahabpardaz/ctablex/commit/66ee464917de6f2d8a4ab3e1b365c5ede46ff967))
+- **content-value:** support missing value ([#22](https://github.com/ctablex/core/issues/22)) ([66ee464](https://github.com/ctablex/core/commit/66ee464917de6f2d8a4ab3e1b365c5ede46ff967))
 
 ### Examples
 
-- **content:** add custom content example ([#21](https://github.com/sahabpardaz/ctablex/issues/21)) ([ff8cc88](https://github.com/sahabpardaz/ctablex/commit/ff8cc88a8f27fc3232e0513f118b72adba83ca66))
-- **material-ui:** add material ui example ([#14](https://github.com/sahabpardaz/ctablex/issues/14)) ([7bfe86b](https://github.com/sahabpardaz/ctablex/commit/7bfe86bc8902de2c823289f103fb5d156901f93d))
+- **content:** add custom content example ([#21](https://github.com/ctablex/core/issues/21)) ([ff8cc88](https://github.com/ctablex/core/commit/ff8cc88a8f27fc3232e0513f118b72adba83ca66))
+- **material-ui:** add material ui example ([#14](https://github.com/ctablex/core/issues/14)) ([7bfe86b](https://github.com/ctablex/core/commit/7bfe86bc8902de2c823289f103fb5d156901f93d))
 
-## [0.2.0](https://github.com/sahabpardaz/ctablex/compare/v0.1.0...v0.2.0) (2020-07-14)
+## [0.2.0](https://github.com/ctablex/core/compare/v0.1.0...v0.2.0) (2020-07-14)
 
 ### ⚠ BREAKING CHANGES
 
@@ -75,26 +75,26 @@ return <Row trEl={<MyTr className="zebra" />} />;
 
 ### Examples
 
-- **basic:** add basic example ([#11](https://github.com/sahabpardaz/ctablex/issues/11)) ([ecbf8cb](https://github.com/sahabpardaz/ctablex/commit/ecbf8cb2c52a5be5785e7c1dcca2547c8242df85))
+- **basic:** add basic example ([#11](https://github.com/ctablex/core/issues/11)) ([ecbf8cb](https://github.com/ctablex/core/commit/ecbf8cb2c52a5be5785e7c1dcca2547c8242df85))
 
 ### Documentations
 
-- **basic-example:** improve readme ([#18](https://github.com/sahabpardaz/ctablex/issues/18)) ([fa29cb8](https://github.com/sahabpardaz/ctablex/commit/fa29cb84c654f3d4b6fa81796d407f17d367ccf1))
+- **basic-example:** improve readme ([#18](https://github.com/ctablex/core/issues/18)) ([fa29cb8](https://github.com/ctablex/core/commit/fa29cb84c654f3d4b6fa81796d407f17d367ccf1))
 
-* rename context types and providers ([#19](https://github.com/sahabpardaz/ctablex/issues/19)) ([a28ddc9](https://github.com/sahabpardaz/ctablex/commit/a28ddc9d1ab0c51d67bbf27c283d19f205f32fcf))
+* rename context types and providers ([#19](https://github.com/ctablex/core/issues/19)) ([a28ddc9](https://github.com/ctablex/core/commit/a28ddc9d1ab0c51d67bbf27c283d19f205f32fcf))
 
-## [0.1.0](https://github.com/sahabpardaz/ctablex/compare/v0.0.1...v0.1.0) (2020-07-04)
+## [0.1.0](https://github.com/ctablex/core/compare/v0.0.1...v0.1.0) (2020-07-04)
 
 ### Features
 
-- add table components ([#1](https://github.com/sahabpardaz/ctablex/issues/1)) ([f4d0d9a](https://github.com/sahabpardaz/ctablex/commit/f4d0d9ad43581f77ddebbec9b863f2c4557d114b))
+- add table components ([#1](https://github.com/ctablex/core/issues/1)) ([f4d0d9a](https://github.com/ctablex/core/commit/f4d0d9ad43581f77ddebbec9b863f2c4557d114b))
 
 ### Documentations
 
-- add the example section to the readme file ([#8](https://github.com/sahabpardaz/ctablex/issues/8)) ([cc62e78](https://github.com/sahabpardaz/ctablex/commit/cc62e7881cce56f2d7fe424ab5e01d13147d525b))
+- add the example section to the readme file ([#8](https://github.com/ctablex/core/issues/8)) ([cc62e78](https://github.com/ctablex/core/commit/cc62e7881cce56f2d7fe424ab5e01d13147d525b))
 
 ### 0.0.1 (2020-06-24)
 
 ### Features
 
-- init project ([25f72c9](https://github.com/sahabpardaz/ctablex/commit/25f72c94c5852224d10de8b3c1373284eeece743))
+- init project ([25f72c9](https://github.com/ctablex/core/commit/25f72c94c5852224d10de8b3c1373284eeece743))

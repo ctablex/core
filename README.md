@@ -2,8 +2,7 @@
 
 [![NPM version](https://badgen.net/npm/v/@ctablex/core)](https://npmjs.com/package/@ctablex/core)
 [![NPM downloads](https://badgen.net/npm/dm/@ctablex/core)](https://npmjs.com/package/@ctablex/core)
-[![Build Status](https://travis-ci.com/sahabpardaz/ctablex.svg?branch=master)](https://travis-ci.com/sahabpardaz/ctablex)
-[![codecov](https://codecov.io/gh/sahabpardaz/ctablex/branch/master/graph/badge.svg)](https://codecov.io/gh/sahabpardaz/ctablex)
+[![codecov](https://codecov.io/gh/ctablex/core/branch/master/graph/badge.svg)](https://codecov.io/gh/ctablex/core)
 
 Featureable, flexible and powerful react table. `ctablex` will not hold you back and let you customize table UI and behavior. `ctablex` name is the combination of `table` and `ctx` (context).
 
@@ -64,7 +63,7 @@ export function MyTable() {
 }
 ```
 
-[live demo](https://codesandbox.io/s/github/sahabpardaz/ctablex/tree/master/examples/basic?file=/src/BasicTable.tsx), [source code](https://github.com/sahabpardaz/ctablex/tree/master/examples/basic)
+[live demo](https://codesandbox.io/s/github/ctablex/core/tree/master/examples/basic?file=/src/BasicTable.tsx), [source code](https://github.com/ctablex/core/tree/master/examples/basic)
 
 ### The `Table` component
 
@@ -128,8 +127,8 @@ is equal to
 
 ## Changelog
 
-Please read the changelog [here](https://github.com/sahabpardaz/ctablex/blob/master/CHANGELOG.md).
+Please read the changelog [here](https://github.com/ctablex/core/blob/master/CHANGELOG.md).
 
 ## License
 
-This project is licensed under the terms of the [Apache License 2.0](https://github.com/sahabpardaz/ctablex/blob/master/LICENSE).
+This project is licensed under the terms of the [Apache License 2.0](https://github.com/ctablex/core/blob/master/LICENSE).
