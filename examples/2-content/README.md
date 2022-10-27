@@ -27,4 +27,4 @@ You can:
 
 - Open this example in a new [CodeSandbox]
 
-[codesandbox]: https://codesandbox.io/s/github/ctablex/core/tree/master/examples/2-content?file=/src/ProductsTable.tsx
+[codesandbox]: https://codesandbox.io/s/github/ctablex/core/tree/main/examples/2-content?file=/src/ProductsTable.tsx
