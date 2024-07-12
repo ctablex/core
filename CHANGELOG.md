@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 <!-- new release -->
 
+## [0.5.1](https://github.com/ctablex/core/compare/0.5.0...0.5.1) (2024-07-12)
+
+- add repository to package.json ([9350975](https://github.com/ctablex/core/commit/93509758734028559d668f42f3c55f8f57d8c93c))
+
 ## [0.5.0](https://github.com/ctablex/core/compare/v0.4.1...v0.5.0) (2024-07-12)
 
 ### ⚠ BREAKING CHANGES
