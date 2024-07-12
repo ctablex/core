@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import React, { Fragment, PropsWithChildren } from 'react';
+import { describe, it, expect, vi } from 'vitest';
 import {
   ArrayOutput,
   Cell,
@@ -132,9 +133,9 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByText(/544 x 5 = 2720/)).toBeInTheDocument();
-    expect(screen.queryByText(/601 x 6 = 3606/)).toBeInTheDocument();
-    expect(screen.queryByText(/116 x 1 = 1/)).toBeInTheDocument();
+    expect(screen.getByText(/544 x 5 = 2720/)).toBeInTheDocument();
+    expect(screen.getByText(/601 x 6 = 3606/)).toBeInTheDocument();
+    expect(screen.getByText(/116 x 1 = 1/)).toBeInTheDocument();
   });
   it('should provide index context', () => {
     render(
@@ -157,9 +158,9 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByText(/1\./)).toBeInTheDocument();
-    expect(screen.queryByText(/2\./)).toBeInTheDocument();
-    expect(screen.queryByText(/3\./)).toBeInTheDocument();
+    expect(screen.getByText(/1\./)).toBeInTheDocument();
+    expect(screen.getByText(/2\./)).toBeInTheDocument();
+    expect(screen.getByText(/3\./)).toBeInTheDocument();
   });
   it('should use custom Components', () => {
     // @ts-ignore
@@ -209,7 +210,7 @@ describe('ctablex', () => {
         </DataTable>
       </TableComponentsProvider>,
     );
-    expect(screen.queryByTestId('table')).toBeInTheDocument();
+    expect(screen.getByTestId('table')).toBeInTheDocument();
     expect(screen.queryAllByTestId('th')[0]).toHaveAttribute('color', 'red');
     expect(screen.queryAllByTestId('td')[0]).toHaveAttribute('color', 'blue');
     expect(console.error).toBeCalledTimes(2);
@@ -281,10 +282,10 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByTestId('table')).toBeInTheDocument();
-    expect(screen.queryByTestId('thead')).toBeInTheDocument();
-    expect(screen.queryByTestId('header-row')).toBeInTheDocument();
-    expect(screen.queryByTestId('tbody')).toBeInTheDocument();
+    expect(screen.getByTestId('table')).toBeInTheDocument();
+    expect(screen.getByTestId('thead')).toBeInTheDocument();
+    expect(screen.getByTestId('header-row')).toBeInTheDocument();
+    expect(screen.getByTestId('tbody')).toBeInTheDocument();
     expect(screen.getAllByTestId('row')[0]).toBeInTheDocument();
     expect(screen.queryAllByTestId('th')[0]).toHaveAttribute('color', 'red');
     expect(screen.queryAllByTestId('td')[0]).toHaveAttribute('color', 'blue');
@@ -318,10 +319,10 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByTestId('table')).toBeInTheDocument();
-    expect(screen.queryByTestId('thead')).toBeInTheDocument();
-    expect(screen.queryByTestId('header-row')).toBeInTheDocument();
-    expect(screen.queryByTestId('tbody')).toBeInTheDocument();
+    expect(screen.getByTestId('table')).toBeInTheDocument();
+    expect(screen.getByTestId('thead')).toBeInTheDocument();
+    expect(screen.getByTestId('header-row')).toBeInTheDocument();
+    expect(screen.getByTestId('tbody')).toBeInTheDocument();
     expect(screen.getAllByTestId('row')[0]).toBeInTheDocument();
     expect(screen.queryAllByTestId('th')[0]).toHaveAttribute('color', 'red');
     expect(screen.queryAllByTestId('td')[0]).toHaveAttribute('color', 'blue');
@@ -361,7 +362,7 @@ describe('ctablex', () => {
   });
 
   it('should use custom key accessor', () => {
-    const fn = jest.fn((row: any) => row.id);
+    const fn = vi.fn((row: any) => row.id);
     render(
       <DataTable data={data}>
         <Columns>
@@ -382,7 +383,7 @@ describe('ctablex', () => {
     expect(fn).toBeCalled();
   });
   it('should render empty column', () => {
-    const { container } = render(
+    render(
       <DataTable data={data}>
         <Columns>
           <Column />
@@ -400,11 +401,12 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    const tds = container.querySelectorAll('td');
+    const tds = screen.getAllByRole('cell');
 
     expect(tds).toHaveLength(6);
     tds.forEach((td) => expect(td).toHaveTextContent(''));
-    expect(container.querySelectorAll('th')).toHaveLength(2);
+    const ths = screen.getAllByRole('columnheader');
+    expect(ths).toHaveLength(2);
   });
   it('should render a custom Row with external data', () => {
     render(
@@ -422,7 +424,7 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByText('Gloves')).toBeInTheDocument();
+    expect(screen.getByText('Gloves')).toBeInTheDocument();
   });
   it('should render a custom Row with different columns definition', () => {
     const count = data.map((row) => row.count).reduce((a, b) => a + b, 0);
@@ -456,7 +458,7 @@ describe('ctablex', () => {
         </Table>
       </DataTable>,
     );
-    expect(screen.queryByText('12 (Sum)')).toBeInTheDocument();
+    expect(screen.getByText('12 (Sum)')).toBeInTheDocument();
   });
   it('should throw error if data is undefined', () => {
     // @ts-ignore

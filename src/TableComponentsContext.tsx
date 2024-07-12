@@ -87,5 +87,5 @@ export function useComponentsToElements(
         </Components.Td>
       ),
     };
-  }, []);
+  }, [Components]);
 }
