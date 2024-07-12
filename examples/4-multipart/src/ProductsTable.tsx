@@ -10,7 +10,7 @@ import {
   TableBody,
 } from '@ctablex/core';
 import { Tooltip } from '@mui/material';
-import React, { Fragment, useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { BooleanContent } from './BooleanContent';
 import { NumberContent } from './NumberContent';
 import { Item } from './types';
@@ -84,7 +84,7 @@ export function ProductsTable(props: Props) {
         </Column>
       </Columns>
       <Columns part="sum">
-        <Column TdProps={{ colspan: 4, align: 'right' }}>Total:</Column>
+        <Column TdProps={{ colSpan: 4, align: 'right' }}>Total:</Column>
         <Column accessor="total" TdProps={{ align: 'right' }}>
           <NumberContent />
         </Column>

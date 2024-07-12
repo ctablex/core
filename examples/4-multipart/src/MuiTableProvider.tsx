@@ -6,9 +6,9 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import React, { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
-export const MuiComponents: TableComponents = {
+const MuiComponents: TableComponents = {
   Table,
   Tbody: TableBody,
   Thead: TableHead,

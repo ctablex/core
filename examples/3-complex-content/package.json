@@ -1,42 +1,29 @@
 {
   "name": "complex-content-example",
-  "version": "1.0.0",
-  "description": "Material-UI ctablex example",
-  "keywords": [
-    "react",
-    "table",
-    "ctablex",
-    "react-table",
-    "datagrid",
-    "material-ui"
-  ],
-  "main": "src/index.tsx",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint --max-warnings=0 src/**/*.{ts,tsx}",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@ctablex/core": "0.3.0",
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/material": "^5.8.2",
-    "@types/faker": "5.5.9",
-    "faker": "5.5.3",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-scripts": "5.0.1"
+    "@ctablex/core": "^0.5.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.16.1",
+    "faker": "^5.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/react": "18.0.11",
-    "@types/react-dom": "18.0.5",
-    "typescript": "4.7.3"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "@types/faker": "^5.5.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1"
+  }
 }

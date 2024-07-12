@@ -1,6 +1,6 @@
 import { Column, Columns, ContentValue, DataTable, Table } from '@ctablex/core';
 import { Tooltip } from '@mui/material';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { BooleanContent } from './BooleanContent';
 import { NumberContent } from './NumberContent';
 import { Item } from './types';

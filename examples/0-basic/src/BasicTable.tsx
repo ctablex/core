@@ -1,5 +1,4 @@
 import { Column, Columns, DataTable, Table } from '@ctablex/core';
-import React from 'react';
 import { Item } from './types';
 
 interface Props {

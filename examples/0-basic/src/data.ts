@@ -7,8 +7,8 @@ export function generateData(n: number, seed: number = 1): Item[] {
     return {
       id: index + '',
       name: faker.commerce.productName(),
-      price: faker.random.number(1000),
-      count: faker.random.number(20),
+      price: faker.datatype.number(1000),
+      count: faker.datatype.number(20),
     };
   });
 }

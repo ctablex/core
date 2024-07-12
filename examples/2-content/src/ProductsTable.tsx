@@ -1,5 +1,4 @@
 import { Column, Columns, DataTable, Table } from '@ctablex/core';
-import React from 'react';
 import { BooleanContent } from './BooleanContent';
 import { NumberContent } from './NumberContent';
 import { Item } from './types';

@@ -1,5 +1,5 @@
 import { useContent } from '@ctablex/core';
-import React, { Fragment, PropsWithChildren, ReactNode } from 'react';
+import { Fragment, PropsWithChildren, ReactNode } from 'react';
 
 interface OwnProps {
   yes?: ReactNode;
