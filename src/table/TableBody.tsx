@@ -10,18 +10,18 @@ import { useTableElements } from '../TableElementsContext';
 import { addProps } from '../utils/add-props';
 import { TablePartProvider } from './TablePartContext';
 
-interface TableBodyOwnProps<D, C extends ComponentType> {
+interface TableBodyOwnProps<C extends ComponentType> {
   TbodyProps?: Partial<ComponentProps<C>>;
   tbodyEl?: ReactElement;
 }
 
-export type TableBodyProps<D, C extends ComponentType> = PropsWithChildren<
-  TableBodyOwnProps<D, C>
+export type TableBodyProps<C extends ComponentType> = PropsWithChildren<
+  TableBodyOwnProps<C>
 >;
 const defaultChildren = <Rows />;
 
-export function TableBody<D, C extends ComponentType = ComponentType>(
-  props: TableBodyProps<D, C>,
+export function TableBody<C extends ComponentType = ComponentType>(
+  props: TableBodyProps<C>,
 ) {
   const { children = defaultChildren } = props;
   const elements = useTableElements();
