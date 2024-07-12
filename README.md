@@ -10,6 +10,10 @@ Featureable, flexible and powerful react table. `ctablex` will not hold you back
 
 - [Install](#install)
 - [Usage](#usage)
+  - [The `Table` component](#the-table-component)
+  - [The `Columns` component](#the-columns-component)
+- [Changelog](#changelog)
+- [License](#license)
 
 <!-- tocstop -->
 

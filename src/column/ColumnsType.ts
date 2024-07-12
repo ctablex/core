@@ -1,9 +1,7 @@
-export interface ColumnsType<D extends object = {}> {
+export interface ColumnsType {
   __COLUMNS__: true;
 }
 
-export function isColumnsType<D extends object = {}>(
-  type: any,
-): type is ColumnsType<D> {
+export function isColumnsType(type: any): type is ColumnsType {
   return Boolean(type && type.__COLUMNS__);
 }

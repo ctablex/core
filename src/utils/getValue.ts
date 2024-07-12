@@ -1,7 +1,7 @@
 import { Accessor } from './accessor';
 import { path } from './path';
 
-export function getValue<D, C>(data: D, accessor: null): null;
+export function getValue<D>(data: D, accessor: null): null;
 export function getValue<D, C>(data: D, accessor: Accessor<D, C>): C;
 export function getValue<D, C>(
   data: D,

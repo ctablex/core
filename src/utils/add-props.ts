@@ -10,7 +10,7 @@ export function addProps(
   if (props === undefined) {
     return el;
   }
-  /* istanbul ignore else */
+  /* istanbul ignore else -- @preserve */
   if (process.env.NODE_ENV !== 'production') {
     const key = `${names.prop},${names.el}`;
     if (!isTold[key]) {
