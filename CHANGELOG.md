@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 <!-- new release -->
 
+## [0.5.0](https://github.com/ctablex/core/compare/v0.4.1...v0.5.0) (2024-07-12)
+
+### ⚠ BREAKING CHANGES
+
+- Change dist files and remove umd build
+- Use vite for build ([#2](https://github.com/ctablex/core/pull/2)) ([75c0cfb](https://github.com/ctablex/core/commit/75c0cfb8cadc9f46cab7f448c31b46470f95d92d))
+
 ### [0.4.0](https://github.com/ctablex/core/compare/v0.3.0...v0.4.0) (2022-10-16)
 
 ### Highlights
