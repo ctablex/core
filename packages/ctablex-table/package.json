@@ -34,31 +34,33 @@
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7",
-    "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^16",
-    "@testing-library/user-event": "^14",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@vitejs/plugin-react": "^4",
-    "@vitest/coverage-istanbul": "^1",
-    "eslint": "^8",
-    "eslint-config-react-app": "^7",
-    "jsdom": "^24",
-    "lint-staged": "^15",
-    "prettier": "^3",
-    "react": "^18",
-    "react-dom": "^18",
-    "typescript": "^5",
-    "vite": "^5",
-    "vite-plugin-dts": "^3",
-    "vitest": "^1"
+    "@microsoft/api-extractor": "catalog:",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-react-app": "catalog:",
+    "jsdom": "catalog:",
+    "lint-staged": "catalog:",
+    "prettier": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@ctablex/core": "workspace:*"
   },
   "peerDependencies": {
-    "@ctablex/core": "workspace:*",
-    "react": "^17",
-    "react-dom": "^17"
+    "react": "^18",
+    "react-dom": "^18"
   }
 }

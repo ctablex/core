@@ -1,3 +1,28 @@
 packages:
     - packages/*
 catalog:
+    "@changesets/cli": ^2.27.12
+    "@commitlint/cli": ^19.6.1
+    "@commitlint/config-conventional": ^19.6.0
+    "@microsoft/api-extractor": ^7
+    "@testing-library/dom": ^10
+    "@testing-library/jest-dom": ^6
+    "@testing-library/react": ^16
+    "@testing-library/user-event": ^14
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    "@vitejs/plugin-react": ^4
+    "@vitest/coverage-istanbul": ^1
+    eslint: ^8
+    eslint-config-react-app: ^7
+    husky: ^9.1.7
+    jsdom: ^24
+    lint-staged: ^15
+    prettier: ^3
+    react: ^18
+    react-dom: ^18
+    typescript: ^5
+    vite: ^5
+    vite-plugin-dts: ^3
+    vitest: ^1

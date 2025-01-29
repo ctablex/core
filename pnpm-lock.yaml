@@ -4,90 +4,168 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@changesets/cli':
+      specifier: ^2.27.12
+      version: 2.27.12
+    '@commitlint/cli':
+      specifier: ^19.6.1
+      version: 19.6.1
+    '@commitlint/config-conventional':
+      specifier: ^19.6.0
+      version: 19.6.0
+    '@microsoft/api-extractor':
+      specifier: ^7
+      version: 7.49.1
+    '@testing-library/dom':
+      specifier: ^10
+      version: 10.4.0
+    '@testing-library/jest-dom':
+      specifier: ^6
+      version: 6.6.3
+    '@testing-library/react':
+      specifier: ^16
+      version: 16.2.0
+    '@testing-library/user-event':
+      specifier: ^14
+      version: 14.6.1
+    '@types/node':
+      specifier: ^20
+      version: 20.17.16
+    '@types/react':
+      specifier: ^18
+      version: 18.3.18
+    '@types/react-dom':
+      specifier: ^18
+      version: 18.3.5
+    '@vitejs/plugin-react':
+      specifier: ^4
+      version: 4.3.4
+    '@vitest/coverage-istanbul':
+      specifier: ^1
+      version: 1.6.0
+    eslint:
+      specifier: ^8
+      version: 8.57.1
+    eslint-config-react-app:
+      specifier: ^7
+      version: 7.0.1
+    husky:
+      specifier: ^9.1.7
+      version: 9.1.7
+    jsdom:
+      specifier: ^24
+      version: 24.1.3
+    lint-staged:
+      specifier: ^15
+      version: 15.4.3
+    prettier:
+      specifier: ^3
+      version: 3.4.2
+    react:
+      specifier: ^18
+      version: 18.3.1
+    react-dom:
+      specifier: ^18
+      version: 18.3.1
+    typescript:
+      specifier: ^5
+      version: 5.7.3
+    vite:
+      specifier: ^5
+      version: 5.4.14
+    vite-plugin-dts:
+      specifier: ^3
+      version: 3.9.1
+    vitest:
+      specifier: ^1
+      version: 1.6.0
+
 importers:
 
   .:
     devDependencies:
       '@changesets/cli':
-        specifier: ^2.27.12
+        specifier: 'catalog:'
         version: 2.27.12
       '@commitlint/cli':
-        specifier: ^19.6.1
+        specifier: 'catalog:'
         version: 19.6.1(@types/node@22.12.0)(typescript@5.7.3)
       '@commitlint/config-conventional':
-        specifier: ^19.6.0
+        specifier: 'catalog:'
         version: 19.6.0
       husky:
-        specifier: ^9.1.7
+        specifier: 'catalog:'
         version: 9.1.7
       prettier:
-        specifier: ^3.4.2
+        specifier: 'catalog:'
         version: 3.4.2
 
   packages/ctablex-core:
     devDependencies:
       '@microsoft/api-extractor':
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.49.1(@types/node@20.17.16)
       '@testing-library/dom':
-        specifier: ^10
+        specifier: 'catalog:'
         version: 10.4.0
       '@testing-library/jest-dom':
-        specifier: ^6
+        specifier: 'catalog:'
         version: 6.6.3
       '@testing-library/react':
-        specifier: ^16
+        specifier: 'catalog:'
         version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
-        specifier: ^14
+        specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.0)
       '@types/node':
-        specifier: ^20
+        specifier: 'catalog:'
         version: 20.17.16
       '@types/react':
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       '@vitejs/plugin-react':
-        specifier: ^4
+        specifier: 'catalog:'
         version: 4.3.4(vite@5.4.14(@types/node@20.17.16))
       '@vitest/coverage-istanbul':
-        specifier: ^1
+        specifier: 'catalog:'
         version: 1.6.0(vitest@1.6.0(@types/node@20.17.16)(jsdom@24.1.3))
       eslint:
-        specifier: ^8
+        specifier: 'catalog:'
         version: 8.57.1
       eslint-config-react-app:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.0.1(@babel/plugin-syntax-flow@7.26.0(@babel/core@7.26.7))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.26.7))(eslint@8.57.1)(typescript@5.7.3)
       jsdom:
-        specifier: ^24
+        specifier: 'catalog:'
         version: 24.1.3
       lint-staged:
-        specifier: ^15
+        specifier: 'catalog:'
         version: 15.4.3
       prettier:
-        specifier: ^3
+        specifier: 'catalog:'
         version: 3.4.2
       react:
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.4.14(@types/node@20.17.16)
       vite-plugin-dts:
-        specifier: ^3
+        specifier: 'catalog:'
         version: 3.9.1(@types/node@20.17.16)(rollup@4.32.1)(typescript@5.7.3)(vite@5.4.14(@types/node@20.17.16))
       vitest:
-        specifier: ^1
+        specifier: 'catalog:'
         version: 1.6.0(@types/node@20.17.16)(jsdom@24.1.3)
 
   packages/ctablex-table:
@@ -97,67 +175,67 @@ importers:
         version: link:../ctablex-core
     devDependencies:
       '@microsoft/api-extractor':
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.49.1(@types/node@20.17.16)
       '@testing-library/dom':
-        specifier: ^10
+        specifier: 'catalog:'
         version: 10.4.0
       '@testing-library/jest-dom':
-        specifier: ^6
+        specifier: 'catalog:'
         version: 6.6.3
       '@testing-library/react':
-        specifier: ^16
+        specifier: 'catalog:'
         version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
-        specifier: ^14
+        specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.0)
       '@types/node':
-        specifier: ^20
+        specifier: 'catalog:'
         version: 20.17.16
       '@types/react':
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       '@vitejs/plugin-react':
-        specifier: ^4
+        specifier: 'catalog:'
         version: 4.3.4(vite@5.4.14(@types/node@20.17.16))
       '@vitest/coverage-istanbul':
-        specifier: ^1
+        specifier: 'catalog:'
         version: 1.6.0(vitest@1.6.0(@types/node@20.17.16)(jsdom@24.1.3))
       eslint:
-        specifier: ^8
+        specifier: 'catalog:'
         version: 8.57.1
       eslint-config-react-app:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.0.1(@babel/plugin-syntax-flow@7.26.0(@babel/core@7.26.7))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.26.7))(eslint@8.57.1)(typescript@5.7.3)
       jsdom:
-        specifier: ^24
+        specifier: 'catalog:'
         version: 24.1.3
       lint-staged:
-        specifier: ^15
+        specifier: 'catalog:'
         version: 15.4.3
       prettier:
-        specifier: ^3
+        specifier: 'catalog:'
         version: 3.4.2
       react:
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.4.14(@types/node@20.17.16)
       vite-plugin-dts:
-        specifier: ^3
+        specifier: 'catalog:'
         version: 3.9.1(@types/node@20.17.16)(rollup@4.32.1)(typescript@5.7.3)(vite@5.4.14(@types/node@20.17.16))
       vitest:
-        specifier: ^1
+        specifier: 'catalog:'
         version: 1.6.0(@types/node@20.17.16)(jsdom@24.1.3)
 
 packages:
@@ -5435,7 +5513,7 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.1':
     dependencies:
-      '@types/node': 20.17.16
+      '@types/node': 22.12.0
 
   '@types/estree@1.0.6': {}
 

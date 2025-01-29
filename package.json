@@ -10,13 +10,13 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "@changesets/cli": "^2.27.12",
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
-    "husky": "^9.1.7",
-    "prettier": "^3.4.2"
+    "@changesets/cli": "catalog:",
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
+    "husky": "catalog:",
+    "prettier": "catalog:"
   },
-    "scripts": {
+  "scripts": {
     "prepare": "husky"
   }
 }
