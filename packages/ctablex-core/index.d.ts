@@ -2,6 +2,11 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
+export declare function accessByPath<T, P extends PathAccessor<T>>(
+  obj: T,
+  path: P,
+): PathAccessorValue<T, P>;
+
 export declare function ArrayContent<V>(
   props: ArrayContentProps<V>,
 ): JSX_2.Element;
@@ -74,6 +79,30 @@ declare type ObjectGetKey<V extends object> = <K extends keyof V>(
   key: K,
   index: number,
 ) => string | number;
+
+export declare type PathAccessor<T> =
+  T extends Array<any>
+    ? never
+    : T extends object
+      ? {
+          [K in keyof T]-?: `${Exclude<K, symbol>}${'' | `.${PathAccessor<T[K]>}`}`;
+        }[keyof T]
+      : never;
+
+export declare type PathAccessorValue<
+  T,
+  K extends PathAccessor<T>,
+> = 0 extends 1 & T
+  ? any
+  : T extends null | undefined
+    ? PathAccessorValue<T & {}, K> | undefined
+    : K extends keyof T
+      ? T[K]
+      : `${K}` extends `${infer Key extends keyof T & string}.${infer Rest}`
+        ? Rest extends PathAccessor<T[Key]>
+          ? PathAccessorValue<T[Key], Rest>
+          : never
+        : undefined;
 
 export declare function useContent<V>(value?: V): V;
 
