@@ -26,3 +26,6 @@ export type { IndexContentProps } from './contents/index-content';
 
 export type { PathAccessor, PathAccessorValue } from './accessor/path-accessor';
 export { accessByPath } from './accessor/path-accessor';
+
+export type { KeyAccessor, KeyAccessorValue } from './accessor/key-accessor';
+export { accessByKey } from './accessor/key-accessor';

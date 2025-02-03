@@ -2,6 +2,11 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
+export declare function accessByKey<T, K extends KeyAccessor<T>>(
+  obj: T,
+  key: K,
+): KeyAccessorValue<T, K>;
+
 export declare function accessByPath<T, P extends PathAccessor<T>>(
   obj: T,
   path: P,
@@ -52,6 +57,26 @@ export declare interface IndexContentProps {
 }
 
 export declare const IndexContext: Context<number | undefined>;
+
+export declare type KeyAccessor<T> =
+  T extends Array<any>
+    ? never
+    : T extends object
+      ? {
+          [K in keyof T]-?: K;
+        }[keyof T]
+      : never;
+
+export declare type KeyAccessorValue<
+  T,
+  K extends KeyAccessor<T>,
+> = 0 extends 1 & T
+  ? any
+  : T extends null | undefined
+    ? KeyAccessorValue<T & {}, K> | undefined
+    : K extends keyof T
+      ? T[K]
+      : undefined;
 
 export declare function KeyContent(): JSX_2.Element;
 
