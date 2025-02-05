@@ -2,7 +2,7 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
-export declare function access<T, R, A extends Accessor<T, R>>(
+export declare function access<T, R, A extends Accessor<T, R> = Accessor<T, R>>(
   t: T,
   a: A,
 ): AccessorValue<T, R, A>;
@@ -32,13 +32,14 @@ export declare type AccessorValue<
   T,
   R = any,
   A extends Accessor<T, R> = Accessor<T, R>,
-> = A extends null
-  ? null
-  : A extends PathAccessor<T, R>
-    ? PathAccessorValue<T, R, A>
-    : A extends FnAccessor<T, R>
-      ? FnAccessorValue<T, A>
-      : never;
+> = R &
+  (A extends null
+    ? null
+    : A extends PathAccessor<T, R>
+      ? PathAccessorValue<T, R, A>
+      : A extends FnAccessor<T, R>
+        ? FnAccessorValue<T, A>
+        : never);
 
 export declare function ArrayContent<V>(
   props: ArrayContentProps<V>,

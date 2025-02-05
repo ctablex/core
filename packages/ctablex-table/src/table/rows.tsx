@@ -20,6 +20,7 @@ export function Rows<D>(props: RowsProps<D>) {
         return index;
       }
       // @ts-nocheck
+      // @ts-ignore
       return access(data, keyAccessor);
     },
     [keyAccessor],

@@ -9,13 +9,13 @@ export type AccessorValue<
   T,
   R = any,
   A extends Accessor<T, R> = Accessor<T, R>,
-> = A extends null
+> = R & (A extends null
   ? null
   : A extends PathAccessor<T, R>
     ? PathAccessorValue<T, R, A>
     : A extends FnAccessor<T, R>
       ? FnAccessorValue<T, A>
-      : never;
+      : never);
 
 export function access<T, R, A extends Accessor<T, R> = Accessor<T, R>>(
   t: T,
