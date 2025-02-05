@@ -2,36 +2,41 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
-export declare function access<T, A extends Accessor<T>>(
+export declare function access<T, R, A extends Accessor<T, R>>(
   t: T,
   a: A,
-): AccessorValue<T, A>;
+): AccessorValue<T, R, A>;
 
 export declare function accessByFn<T, F extends FnAccessor<T>>(
   obj: T,
   fn: F,
 ): FnAccessorValue<T, F>;
 
-export declare function accessByKey<T, K extends KeyAccessor<T>>(
-  obj: T,
-  key: K,
-): KeyAccessorValue<T, K>;
+export declare function accessByKey<
+  T,
+  R,
+  K extends KeyAccessor<T, R> = KeyAccessor<T, R>,
+>(obj: T, key: K): KeyAccessorValue<T, R, K>;
 
-export declare function accessByPath<T, P extends PathAccessor<T>>(
-  obj: T,
-  path: P,
-): PathAccessorValue<T, P>;
+export declare function accessByPath<
+  T,
+  R,
+  P extends PathAccessor<T, R> = PathAccessor<T, R>,
+>(obj: T, path: P): PathAccessorValue<T, R, P>;
 
-export declare type Accessor<T, R = any> =
-  | null
-  | PathAccessor<T>
-  | FnAccessor<T, R>;
+export declare type Accessor<T, R = any> = null extends R
+  ? null | PathAccessor<T, R> | FnAccessor<T, R>
+  : PathAccessor<T, R> | FnAccessor<T, R>;
 
-export declare type AccessorValue<T, A extends Accessor<T>> = A extends null
+export declare type AccessorValue<
+  T,
+  R = any,
+  A extends Accessor<T, R> = Accessor<T, R>,
+> = A extends null
   ? null
-  : A extends PathAccessor<T>
-    ? PathAccessorValue<T, A>
-    : A extends FnAccessor<T>
+  : A extends PathAccessor<T, R>
+    ? PathAccessorValue<T, R, A>
+    : A extends FnAccessor<T, R>
       ? FnAccessorValue<T, A>
       : never;
 
@@ -125,25 +130,27 @@ export declare interface IndexContentProps {
 
 export declare const IndexContext: Context<number | undefined>;
 
-export declare type KeyAccessor<T> =
+export declare type KeyAccessor<T, R = any> =
   T extends Array<any>
     ? never
     : T extends object
       ? {
-          [K in keyof T]-?: K;
+          [K in keyof T]-?: T[K] extends R ? K : never;
         }[keyof T]
       : never;
 
 export declare type KeyAccessorValue<
   T,
-  K extends KeyAccessor<T>,
-> = 0 extends 1 & T
-  ? any
-  : T extends null | undefined
-    ? KeyAccessorValue<T & {}, K> | undefined
-    : K extends keyof T
-      ? T[K]
-      : undefined;
+  R = any,
+  K extends KeyAccessor<T, R> = KeyAccessor<T, R>,
+> = R &
+  (0 extends 1 & T
+    ? any
+    : T extends null | undefined
+      ? KeyAccessorValue<T & {}, K> | undefined
+      : K extends KeyAccessor<T>
+        ? T[K]
+        : undefined);
 
 export declare function KeyContent(): JSX_2.Element;
 
@@ -172,29 +179,33 @@ declare type ObjectGetKey<V extends object> = <K extends keyof V>(
   index: number,
 ) => string | number;
 
-export declare type PathAccessor<T> =
+export declare type PathAccessor<T, R = any> =
   T extends Array<any>
     ? never
     : T extends object
       ? {
-          [K in keyof T]-?: `${Exclude<K, symbol>}${'' | `.${PathAccessor<T[K]>}`}`;
+          [K in keyof T]-?: `${Exclude<K, symbol>}${(T[K] extends R ? '' : never) | `.${undefined extends R ? PathAccessor<T[K], R> : undefined extends T[K] ? never : null extends T[K] ? never : PathAccessor<T[K], R>}`}`;
         }[keyof T]
       : never;
 
 export declare type PathAccessorValue<
   T,
-  K extends PathAccessor<T>,
-> = 0 extends 1 & T
-  ? any
-  : T extends null | undefined
-    ? PathAccessorValue<T & {}, K> | undefined
-    : K extends keyof T
-      ? T[K]
-      : `${K}` extends `${infer Key extends keyof T & string}.${infer Rest}`
-        ? Rest extends PathAccessor<T[Key]>
-          ? PathAccessorValue<T[Key], Rest>
+  R = any,
+  K extends PathAccessor<T> = PathAccessor<T, R>,
+> = R &
+  (0 extends 1 & T
+    ? any
+    : T extends null | undefined
+      ? PathAccessorValue<T & {}, R, K> | undefined
+      : K extends keyof T
+        ? T[K] extends R
+          ? T[K]
           : never
-        : undefined;
+        : `${K}` extends `${infer Key extends keyof T & string}.${infer Rest}`
+          ? Rest extends PathAccessor<T[Key]>
+            ? PathAccessorValue<T[Key], R, Rest>
+            : never
+          : undefined);
 
 export declare function useContent<V>(value?: V): V;
 

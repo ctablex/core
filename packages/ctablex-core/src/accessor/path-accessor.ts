@@ -1,28 +1,44 @@
-export type PathAccessor<T> =
+export type PathAccessor<T, R = any> =
   T extends Array<any>
     ? never
     : T extends object
       ? {
-          [K in keyof T]-?: `${Exclude<K, symbol>}${'' | `.${PathAccessor<T[K]>}`}`;
+          [K in keyof T]-?: `${Exclude<K, symbol>}${
+            | (T[K] extends R ? '' : never)
+            | `.${undefined extends R
+                ? PathAccessor<T[K], R>
+                : undefined extends T[K]
+                  ? never
+                  : null extends T[K]
+                    ? never
+                    : PathAccessor<T[K], R>}`}`;
         }[keyof T]
       : never;
 
-export type PathAccessorValue<T, K extends PathAccessor<T>> = 0 extends 1 & T
-  ? any
-  : T extends null | undefined
-    ? PathAccessorValue<T & {}, K> | undefined
-    : K extends keyof T
-      ? T[K]
-      : `${K}` extends `${infer Key extends keyof T & string}.${infer Rest}`
-        ? Rest extends PathAccessor<T[Key]>
-          ? PathAccessorValue<T[Key], Rest>
+export type PathAccessorValue<
+  T,
+  R = any,
+  K extends PathAccessor<T> = PathAccessor<T, R>,
+> = R &
+  (0 extends 1 & T
+    ? any
+    : T extends null | undefined
+      ? PathAccessorValue<T & {}, R, K> | undefined
+      : K extends keyof T
+        ? T[K] extends R
+          ? T[K]
           : never
-        : undefined;
+        : `${K}` extends `${infer Key extends keyof T & string}.${infer Rest}`
+          ? Rest extends PathAccessor<T[Key]>
+            ? PathAccessorValue<T[Key], R, Rest>
+            : never
+          : undefined);
 
-export function accessByPath<T, P extends PathAccessor<T>>(
-  obj: T,
-  path: P,
-): PathAccessorValue<T, P> {
+export function accessByPath<
+  T,
+  R,
+  P extends PathAccessor<T, R> = PathAccessor<T, R>,
+>(obj: T, path: P): PathAccessorValue<T, R, P> {
   let keys = path.split('.');
 
   // @ts-ignore

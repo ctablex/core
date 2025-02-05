@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { accessByKey, KeyAccessor } from './key-accessor';
 
-function keyAccessor<T>(t: T): KeyAccessor<T> {
+function keyAccessor<T, R>(t: T): KeyAccessor<T, R> {
   return '' as any;
 }
 
@@ -130,5 +130,43 @@ describe('key accessor', () => {
     // @ts-expect-error
     accessByKey(obj3, 'a');
     expectTypeOf(keyAccessor(obj3)).toEqualTypeOf<never>();
+  });
+
+  it('should support narrowed types', () => {
+    type Obj = {
+      a: number;
+      b: string;
+      five: 5;
+      optional?: number;
+    };
+
+    const obj: Obj = { a: 1, b: 'c', five: 5 };
+
+    expectTypeOf(keyAccessor<Obj, number>(obj)).toEqualTypeOf<'a' | 'five'>();
+    expectTypeOf(keyAccessor<Obj, number | undefined>(obj)).toEqualTypeOf<
+      'a' | 'five' | 'optional'
+    >();
+
+    function fn(t: Obj, a: KeyAccessor<Obj, number>): number {
+      return accessByKey<Obj, number>(t, a);
+    }
+
+    expect(fn(obj, 'a')).toBe(1);
+  });
+
+  it('should support narrowed types in generic fn', () => {
+    function fn<T>(t: T, a: KeyAccessor<T, number>): number {
+      return accessByKey<T, number>(t, a);
+    }
+
+    type Obj = {
+      a: number;
+      b: string;
+      five: 5;
+      optional?: number;
+    };
+
+    const obj: Obj = { a: 1, b: 'c', five: 5 };
+    expect(fn(obj, 'five')).toBe(5);
   });
 });

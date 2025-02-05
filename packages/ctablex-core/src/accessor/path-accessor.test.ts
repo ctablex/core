@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { accessByPath, PathAccessor } from './path-accessor';
 
-function pathAccessor<T>(t: T): PathAccessor<T> {
+function pathAccessor<T, R>(t: T): PathAccessor<T, R> {
   return '' as any;
 }
 
@@ -196,5 +196,107 @@ describe('path accessor', () => {
     // @ts-expect-error
     accessByPath(obj3, 'a');
     expectTypeOf(pathAccessor(obj3)).toEqualTypeOf<never>();
+  });
+
+  it('should support narrowed types', () => {
+    type Obj = {
+      a: number;
+      b: string;
+      five: 5;
+      optional?: number;
+    };
+
+    const obj: Obj = { a: 1, b: 'c', five: 5 };
+
+    expectTypeOf(pathAccessor<Obj, number>(obj)).toEqualTypeOf<'a' | 'five'>();
+    expectTypeOf(pathAccessor<Obj, number | undefined>(obj)).toEqualTypeOf<
+      'a' | 'five' | 'optional'
+    >();
+
+    function fn(t: Obj, a: PathAccessor<Obj, number>): number {
+      return accessByPath<Obj, number>(t, a);
+    }
+
+    expect(fn(obj, 'a')).toBe(1);
+  });
+
+  it('should support narrowed types in nested', () => {
+    type Obj = {
+      num: number;
+      str: string;
+      some: { five: 5; name: 'v' };
+    };
+
+    const obj: Obj = { num: 3, str: 'foo', some: { five: 5, name: 'v' } };
+
+    expectTypeOf(pathAccessor<Obj, number>(obj)).toEqualTypeOf<
+      'num' | 'some.five'
+    >();
+    expectTypeOf(pathAccessor<Obj, number | boolean>(obj)).toEqualTypeOf<
+      'num' | 'some.five'
+    >();
+    expectTypeOf(pathAccessor<Obj, number | string>(obj)).toEqualTypeOf<
+      'num' | 'str' | 'some.five' | 'some.name'
+    >();
+  });
+
+  it('should support narrowed types in nested with optional', () => {
+    type Obj = {
+      num: number;
+      nullable: number | null;
+      optional?: { five: 5; four?: 4; name: 'v' };
+      deep_null: { six: 6 } | null;
+    };
+
+    const obj: Obj = { num: 3, nullable: null, deep_null: null };
+
+    expectTypeOf(pathAccessor<Obj, number>(obj)).toEqualTypeOf<'num'>();
+    expectTypeOf(pathAccessor<Obj, number | null>(obj)).toEqualTypeOf<
+      'num' | 'nullable'
+    >();
+    expectTypeOf(pathAccessor<Obj, number | undefined>(obj)).toEqualTypeOf<
+      'num' | 'optional.five' | 'optional.four' | 'deep_null.six'
+    >();
+    expectTypeOf(
+      pathAccessor<Obj, number | null | undefined>(obj),
+    ).toEqualTypeOf<
+      'num' | 'nullable' | 'optional.five' | 'optional.four' | 'deep_null.six'
+    >();
+  });
+
+  it('should support narrowed types in nested with union', () => {
+    type Obj =
+      | {
+          union: { a: number } | { b: string };
+        }
+      | { x: number }
+      | { y: string };
+
+    const obj: Obj = { x: 5 };
+
+    expectTypeOf(pathAccessor<Obj, number>(obj)).toEqualTypeOf<
+      'x' | 'union.a'
+    >();
+    expectTypeOf(pathAccessor<Obj, number | boolean>(obj)).toEqualTypeOf<
+      'x' | 'union.a'
+    >();
+    expectTypeOf(pathAccessor<Obj, number | string>(obj)).toEqualTypeOf<
+      'x' | 'y' | 'union.a' | 'union.b'
+    >();
+  });
+
+  it('should support narrowed types in generic fn', () => {
+    function fn<T>(t: T, a: PathAccessor<T, number>): number {
+      return accessByPath<T, number>(t, a);
+    }
+
+    type Obj = {
+      num: number;
+      str: string;
+      some: { five: 5; name: 'v' };
+    };
+
+    const obj: Obj = { num: 3, str: 'foo', some: { five: 5, name: 'v' } };
+    expect(fn(obj, 'some.five')).toBe(5);
   });
 });

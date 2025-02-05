@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { access } from './accessor';
+import { access, Accessor } from './accessor';
 
 describe('accessor', () => {
   it('should support null accessor', () => {
@@ -32,5 +32,22 @@ describe('accessor', () => {
     expectTypeOf(access(obj, (o) => o.b)).toEqualTypeOf<{ c: string }>();
     expect(access(obj, (o) => o.b.c)).toBe('d');
     expectTypeOf(access(obj, (o) => o.b.c)).toEqualTypeOf<string>();
+  });
+
+  it('should support narrowed types in generic fn', () => {
+    function fn<T>(t: T, a: Accessor<T, number>): number {
+      return access<T, number>(t, a);
+    }
+
+    type Obj = {
+      num: number;
+      str: string;
+      some: { five: 5; name: 'v' };
+    };
+
+    const obj: Obj = { num: 3, str: 'foo', some: { five: 5, name: 'v' } };
+
+    expect(fn(obj, 'some.five')).toBe(5);
+    expect(fn(obj, (o) => o.num)).toBe(5);
   });
 });
