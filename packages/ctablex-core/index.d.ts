@@ -2,6 +2,11 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
+export declare function access<T, A extends Accessor<T>>(
+  t: T,
+  a: A,
+): AccessorValue<T, A>;
+
 export declare function accessByFn<T, F extends FnAccessor<T>>(
   obj: T,
   fn: F,
@@ -17,6 +22,27 @@ export declare function accessByPathTo<
   T,
   K extends PathAccessorTo<T, R> = PathAccessorTo<T, R>,
 >(t: T, path: K): R & PathAccessorValue<T, K>;
+
+export declare type Accessor<T> = null | PathAccessor<T> | FnAccessor<T>;
+
+export declare type AccessorTo<T, R = any> =
+  | null
+  | PathAccessorTo<T, R>
+  | FnAccessor<T, R>;
+
+export declare type AccessorValue<T, A extends Accessor<T>> = A extends null
+  ? null
+  : A extends PathAccessor<T>
+    ? PathAccessorValue<T, A>
+    : A extends FnAccessor<T>
+      ? FnAccessorValue<T, A>
+      : never;
+
+export declare function accessTo<
+  R,
+  T,
+  A extends AccessorTo<T, R> = AccessorTo<T, R>,
+>(t: T, a: A): R & AccessorValue<T, A>;
 
 declare type AllowedIndexes<
   Tuple extends ReadonlyArray<any>,
