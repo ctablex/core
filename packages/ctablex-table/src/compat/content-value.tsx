@@ -1,17 +1,16 @@
-import { ContentProvider, DefaultContent, useContent } from '@ctablex/core';
+import { access, Accessor, ContentProvider, DefaultContent, useContent } from '@ctablex/core';
 import { ReactNode } from 'react';
-import { getValue, Accessor } from '../accessor';
 
 const defaultChildren = <DefaultContent />;
 
-export interface ContentValueProps<D, C> {
-  accessor: Accessor<D, C>;
+export interface ContentValueProps<D> {
+  accessor: Accessor<D>;
   children?: ReactNode;
 }
 
-export function ContentValue<D, C>(props: ContentValueProps<D, C>) {
+export function ContentValue<D>(props: ContentValueProps<D>) {
   const { children = defaultChildren } = props;
   const content = useContent<D>();
-  const value = getValue(content, props.accessor);
+  const value = access(content, props.accessor);
   return <ContentProvider value={value}>{children}</ContentProvider>;
 }

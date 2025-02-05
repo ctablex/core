@@ -1,6 +1,5 @@
-import { ArrayContent, ContentProvider, useContent } from '@ctablex/core';
+import { access, Accessor, ArrayContent, ContentProvider, useContent } from '@ctablex/core';
 import { ReactNode, useCallback } from 'react';
-import { Accessor, getValue } from '../accessor';
 import { Row } from './row';
 
 const defaultChildren = <Row />;
@@ -20,7 +19,7 @@ export function Rows<D>(props: RowsProps<D>) {
       if (!keyAccessor) {
         return index;
       }
-      return getValue(data, keyAccessor);
+      return access(data, keyAccessor);
     },
     [keyAccessor],
   );
