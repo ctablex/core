@@ -32,3 +32,6 @@ export { accessByKey } from './accessor/key-accessor';
 
 export type { FnAccessor, FnAccessorValue } from './accessor/fn-accessor';
 export type { accessByFn } from './accessor/fn-accessor';
+
+export type { Accessor, AccessorValue } from './accessor/accessor';
+export { access } from './accessor/accessor';
