@@ -29,3 +29,6 @@ export { accessByPath } from './accessor/path-accessor';
 
 export type { KeyAccessor, KeyAccessorValue } from './accessor/key-accessor';
 export { accessByKey } from './accessor/key-accessor';
+
+export type { FnAccessor, FnAccessorValue } from './accessor/fn-accessor';
+export type { accessByFn } from './accessor/fn-accessor';
