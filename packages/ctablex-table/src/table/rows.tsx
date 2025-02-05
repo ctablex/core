@@ -19,6 +19,7 @@ export function Rows<D>(props: RowsProps<D>) {
       if (!keyAccessor) {
         return index;
       }
+      // @ts-nocheck
       return access(data, keyAccessor);
     },
     [keyAccessor],

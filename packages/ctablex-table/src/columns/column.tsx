@@ -5,17 +5,17 @@ import { HeaderCell } from '../table/header-cell';
 import { HEADER_PART } from '../table/table-header';
 import { usePart } from './part-context';
 
-export interface ColumnProps<D> {
+export interface ColumnProps<D=any> {
   children?: ReactNode;
   header?: ReactNode;
-  accessor?: Accessor<any>;
+  accessor?: Accessor<D>;
   el?: ReactElement;
   thEl?: ReactElement;
 }
 
 const defaultChildren = <DefaultContent />;
 
-export function Column<D>(props: ColumnProps<D>) {
+export function Column<D=any>(props: ColumnProps<D>) {
   const { children = defaultChildren } = props;
   const part = usePart();
   if (part === HEADER_PART) {

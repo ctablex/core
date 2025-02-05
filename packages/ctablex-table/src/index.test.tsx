@@ -84,11 +84,11 @@ describe('ctablex', () => {
     const { container } = render(
       <DataTable data={data}>
         <Columns>
-          <Column header="Name" accessor="name" />
+          <Column<Data> header="Name" accessor="name" />
           <Column header="Total">
-            <ContentValue accessor="price" />
+            <ContentValue<Data> accessor="price" />
             {' x '}
-            <ContentValue accessor="count" />
+            <ContentValue<Data> accessor="count" />
             {' = '}
             <ContentValue accessor={(r: any) => r.price * r.count} />
           </Column>

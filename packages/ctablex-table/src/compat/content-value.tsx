@@ -8,7 +8,7 @@ export interface ContentValueProps<D> {
   children?: ReactNode;
 }
 
-export function ContentValue<D>(props: ContentValueProps<D>) {
+export function ContentValue<D=any>(props: ContentValueProps<D>) {
   const { children = defaultChildren } = props;
   const content = useContent<D>();
   const value = access(content, props.accessor);
