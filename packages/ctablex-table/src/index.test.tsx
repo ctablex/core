@@ -1,6 +1,6 @@
 import { DefaultContent, IndexContent, useContent } from '@ctablex/core';
 import { render, screen } from '@testing-library/react';
-import React, { cloneElement, Fragment } from 'react';
+import React, { cloneElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import {
   TableElementsProvider,
@@ -406,5 +406,23 @@ describe('ctablex', () => {
     // @ts-ignore
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Columns />)).toThrow();
+  });
+  it('should accept type', () => {
+    render(
+      <DataTable data={data}>
+        <Columns>
+          <Column>
+            <IndexCell />
+          </Column>
+          <Column<Data> header="Name" accessor="name" />
+          <Column<Data> header="Price" accessor="price" />
+          <Column<Data> header="Count" accessor="count" />
+          <Column<Data> header="Color" accessor="color" />
+          {/* @ts-expect-error */}
+          <Column<Data> header="Name" accessor="bad" />
+        </Columns>
+        <Table />
+      </DataTable>,
+    );
   });
 });
