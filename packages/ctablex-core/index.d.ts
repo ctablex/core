@@ -2,6 +2,11 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
+export declare function accessByFn<T, F extends FnAccessor<T>>(
+  obj: T,
+  fn: F,
+): FnAccessorValue<T, F>;
+
 export declare function accessByPath<T, K extends PathAccessor<T>>(
   t: T,
   path: K,
@@ -66,6 +71,50 @@ export declare interface FieldContentProps<V> {
   field: keyof V;
   children?: ReactNode;
 }
+
+export declare type FnAccessor<T, R = any> = (t: T) => R;
+
+export declare type FnAccessorValue<T, F extends FnAccessor<T>> = F extends {
+  (t: T, ...args: any[]): infer R;
+  (t: T, ...args: any[]): any;
+  (t: T, ...args: any[]): any;
+  (t: T, ...args: any[]): any;
+  (t: T, ...args: any[]): any;
+}
+  ? R
+  : F extends {
+        (t: T, ...args: any[]): any;
+        (t: T, ...args: any[]): infer R;
+        (t: T, ...args: any[]): any;
+        (t: T, ...args: any[]): any;
+        (t: T, ...args: any[]): any;
+      }
+    ? R
+    : F extends {
+          (t: T, ...args: any[]): any;
+          (t: T, ...args: any[]): any;
+          (t: T, ...args: any[]): infer R;
+          (t: T, ...args: any[]): any;
+          (t: T, ...args: any[]): any;
+        }
+      ? R
+      : F extends {
+            (t: T, ...args: any[]): any;
+            (t: T, ...args: any[]): any;
+            (t: T, ...args: any[]): any;
+            (t: T, ...args: any[]): infer R;
+            (t: T, ...args: any[]): any;
+          }
+        ? R
+        : F extends {
+              (t: T, ...args: any[]): any;
+              (t: T, ...args: any[]): any;
+              (t: T, ...args: any[]): any;
+              (t: T, ...args: any[]): any;
+              (t: T, ...args: any[]): infer R;
+            }
+          ? R
+          : any;
 
 declare type Index40 = ComputeRange<40>[number];
 

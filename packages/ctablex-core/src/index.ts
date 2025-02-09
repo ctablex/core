@@ -30,3 +30,6 @@ export type {
   PathAccessorTo,
 } from './accessor/path-accessor';
 export { accessByPath, accessByPathTo } from './accessor/path-accessor';
+
+export type { FnAccessor, FnAccessorValue } from './accessor/fn-accessor';
+export type { accessByFn } from './accessor/fn-accessor';
