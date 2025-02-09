@@ -1,19 +1,16 @@
+import { Accessor } from '@ctablex/core';
+import { AccessorTo } from '@ctablex/core';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 
-export declare type Accessor<D, C> =
-  | StringAccessor<D, C>
-  | FunctionAccessor<D, C>
-  | null;
+export declare function Column<D = any>(props: ColumnProps<D>): JSX_2.Element;
 
-export declare function Column(props: ColumnProps): JSX_2.Element;
-
-export declare interface ColumnProps {
+export declare interface ColumnProps<D = any> {
   children?: ReactNode;
   header?: ReactNode;
-  accessor?: Accessor<any, any>;
+  accessor?: Accessor<D>;
   el?: ReactElement;
   thEl?: ReactElement;
 }
@@ -29,12 +26,12 @@ export declare interface ColumnsProps {
   children?: ReactNode;
 }
 
-export declare function ContentValue<D, C>(
-  props: ContentValueProps<D, C>,
+export declare function ContentValue<D = any>(
+  props: ContentValueProps<D>,
 ): JSX_2.Element;
 
-declare interface ContentValueProps<D, C> {
-  accessor: Accessor<D, C>;
+declare interface ContentValueProps<D> {
+  accessor: Accessor<D>;
   children?: ReactNode;
 }
 
@@ -47,17 +44,6 @@ export declare interface DataTableProps<D> {
 
 export declare const defaultTableElements: TableElements;
 
-declare type FunctionAccessor<D, C> = (data: D) => C;
-
-export declare function getValue<D>(data: D, accessor: null): null;
-
-export declare function getValue<D, C>(data: D, accessor: Accessor<D, C>): C;
-
-export declare function getValue<D, C>(
-  data: D,
-  accessor: Accessor<D, C> | null,
-): C | null;
-
 export declare function Row<R>(props: RowProps<R>): JSX_2.Element;
 
 export declare interface RowProps<R> {
@@ -69,14 +55,10 @@ export declare interface RowProps<R> {
 export declare function Rows<D>(props: RowsProps<D>): JSX_2.Element;
 
 export declare interface RowsProps<D> {
-  keyAccessor?: Accessor<D, string | number>;
+  keyAccessor?: AccessorTo<D, string | number>;
   children?: ReactNode;
   rows?: ReadonlyArray<D>;
 }
-
-declare type StringAccessor<D, C> = {
-  [K in keyof D]-?: D[K] extends C ? K : never;
-}[keyof D];
 
 export declare function Table(
   props: TableProps,

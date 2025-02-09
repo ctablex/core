@@ -25,9 +25,6 @@ export type { ColumnProps } from './columns/column';
 export { Columns } from './columns/columns';
 export type { ColumnsProps } from './columns/columns';
 
-export { getValue } from './accessor';
-export type { Accessor } from './accessor';
-
 export { defaultTableElements } from './elements/table-elements';
 export type { TableElements } from './elements/table-elements';
 

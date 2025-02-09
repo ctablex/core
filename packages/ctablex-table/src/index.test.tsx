@@ -1,6 +1,6 @@
 import { DefaultContent, IndexContent, useContent } from '@ctablex/core';
 import { render, screen } from '@testing-library/react';
-import React, { cloneElement, Fragment } from 'react';
+import React, { cloneElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import {
   TableElementsProvider,
@@ -34,29 +34,32 @@ type Data = {
   name: string;
   price: number;
   count: number;
-  color: string;
+  info: {
+    color: string;
+    weight: number;
+  };
 };
-const data = [
+const data: Data[] = [
   {
     id: '1',
     name: 'Gloves',
     price: 544,
     count: 5,
-    color: 'plum',
+    info: { color: 'plum', weight: 5 },
   },
   {
     id: '2',
     name: 'Salad',
     price: 601,
     count: 6,
-    color: 'turquoise',
+    info: { color: 'turquoise', weight: 1 },
   },
   {
     id: '3',
     name: 'Keyboard',
     price: 116,
     count: 1,
-    color: 'silver',
+    info: { color: 'silver', weight: 10 },
   },
 ];
 
@@ -71,7 +74,7 @@ describe('ctablex', () => {
           <Column header="Name" accessor="name" />
           <Column header="Price" accessor="price" />
           <Column header="Count" accessor="count" />
-          <Column header="Color" accessor="color" />
+          <Column header="Color" accessor="info.color" />
         </Columns>
         <Table />
       </DataTable>,
@@ -406,5 +409,23 @@ describe('ctablex', () => {
     // @ts-ignore
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Columns />)).toThrow();
+  });
+  it('should accept type', () => {
+    render(
+      <DataTable data={data}>
+        <Columns>
+          <Column>
+            <IndexCell />
+          </Column>
+          <Column<Data> header="Name" accessor="name" />
+          <Column<Data> header="Price" accessor="price" />
+          <Column<Data> header="Count" accessor="count" />
+          <Column<Data> header="Color" accessor="info.color" />
+          {/* @ts-expect-error */}
+          <Column<Data> header="Name" accessor="bad" />
+        </Columns>
+        <Table />
+      </DataTable>,
+    );
   });
 });

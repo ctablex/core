@@ -1,12 +1,17 @@
-import { ArrayContent, ContentProvider, useContent } from '@ctablex/core';
+import {
+  AccessorTo,
+  accessTo,
+  ArrayContent,
+  ContentProvider,
+  useContent,
+} from '@ctablex/core';
 import { ReactNode, useCallback } from 'react';
-import { Accessor, getValue } from '../accessor';
 import { Row } from './row';
 
 const defaultChildren = <Row />;
 
 export interface RowsProps<D> {
-  keyAccessor?: Accessor<D, string | number>;
+  keyAccessor?: AccessorTo<D, string | number>;
   children?: ReactNode;
   rows?: ReadonlyArray<D>;
 }
@@ -16,11 +21,11 @@ export function Rows<D>(props: RowsProps<D>) {
   const { children = defaultChildren } = props;
   const rows = useContent(props.rows);
   const getKey = useCallback(
-    (data: D, index: number) => {
+    (data: D, index: number): number | string => {
       if (!keyAccessor) {
         return index;
       }
-      return getValue(data, keyAccessor);
+      return accessTo(data, keyAccessor);
     },
     [keyAccessor],
   );
