@@ -25,6 +25,15 @@ export declare function accessByPathTo<
 
 export declare type Accessor<T> = null | PathAccessor<T> | FnAccessor<T>;
 
+export declare function AccessorContent<V>(
+  props: AccessorContentProps<V>,
+): JSX_2.Element;
+
+export declare interface AccessorContentProps<V> {
+  accessor: Accessor<V>;
+  children?: ReactNode;
+}
+
 export declare type AccessorTo<T, R = any> =
   | null
   | PathAccessorTo<T, R>

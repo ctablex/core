@@ -1,6 +1,7 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ContentProvider, useContent } from '../content-provider';
+import { AccessorContent } from './accessor-content';
 import { ArrayContent } from './array-content';
 import { DefaultContent } from './default-content';
 import { FieldContent } from './field-content';
@@ -156,6 +157,33 @@ describe('content', () => {
     );
     expect(screen.getByTestId('root')).toHaveTextContent(
       'name: a, age: 5,|name: b, age: unknown,',
+    );
+  });
+  it('should render array of deep object', () => {
+    interface Data {
+      name: string;
+      info: {
+        color: 'string';
+        weight: number;
+      };
+    }
+    const data = [
+      { name: 'a', info: { color: 'red', weight: 4 } },
+      { name: 'b', info: { color: 'red', weight: 4 } },
+    ];
+    render(
+      <div data-testid="root">
+        <ContentProvider value={data}>
+          <ArrayContent join="|">
+            name: <AccessorContent<Data> accessor="name" />, color:{' '}
+            <AccessorContent<Data> accessor="info.color" />, weight:{' '}
+            <AccessorContent<Data> accessor={(item) => item.info.weight} />
+          </ArrayContent>
+        </ContentProvider>
+      </div>,
+    );
+    expect(screen.getByTestId('root')).toHaveTextContent(
+      'name: a, color: red, weight: 4|name: b, color: red, weight: 4',
     );
   });
   it('should render array of objects', () => {

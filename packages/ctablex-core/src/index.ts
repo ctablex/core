@@ -17,6 +17,9 @@ export type { NullableContentProps } from './contents/nullable-content';
 export { FieldContent } from './contents/field-content';
 export type { FieldContentProps } from './contents/field-content';
 
+export { AccessorContent } from './contents/accessor-content';
+export type { AccessorContentProps } from './contents/accessor-content';
+
 export { ObjectContent } from './contents/object-content';
 export type { ObjectContentProps } from './contents/object-content';
 
