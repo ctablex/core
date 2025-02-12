@@ -174,7 +174,7 @@ describe('content', () => {
     render(
       <div data-testid="root">
         <ContentProvider value={data}>
-          <ArrayContent join="|">
+          <ArrayContent<Data> join="|" getKey="name">
             name: <AccessorContent<Data> accessor="name" />, color:{' '}
             <AccessorContent<Data> accessor="info.color" />, weight:{' '}
             <AccessorContent<Data> accessor={(item) => item.info.weight} />

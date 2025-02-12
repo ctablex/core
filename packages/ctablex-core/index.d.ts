@@ -67,10 +67,12 @@ export declare function ArrayContent<V>(
 ): JSX_2.Element;
 
 export declare interface ArrayContentProps<V> {
-  getKey?: (value: V, index: number) => string | number;
+  getKey?: PathAccessorTo<V, string | number> | ArrayGetKey<V>;
   children?: ReactNode;
   join?: ReactNode;
 }
+
+declare type ArrayGetKey<V> = (value: V, index: number) => string | number;
 
 declare type ComputeRange<
   N extends number,
