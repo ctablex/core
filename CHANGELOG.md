@@ -4,6 +4,74 @@ All notable changes to this project will be documented in this file.
 
 <!-- new release -->
 
+## [0.6.0](https://github.com/ctablex/core/compare/0.5.1...0.6.0) (2025-02-16)
+
+### Breaking Changes
+
+**Package Restructure**
+
+- Rewrote `@ctablex/core` and moved core table concepts to `@ctablex/table`.
+
+**Context Changes**
+
+- All data now flows through `ContentContext` (replaces `DataContext`, `RowContext`, and other removed contexts).
+- The `TableComponentsProvider` is replaced with `TableElementsProvider`
+
+```tsx
+const elements: TableElements = {
+  table: <table data-testid="ctx-table" />,
+  thead: <thead data-testid="ctx-thead" />,
+  tbody: <tbody data-testid="ctx-tbody" />,
+  tfoot: <tfoot data-testid="ctx-tfoot" />,
+  tr: <tr data-testid="ctx-tr" />,
+  th: <th data-testid="ctx-th" />,
+  td: <td data-testid="ctx-td" />,
+};
+
+<TableElementsProvider value={elements}>
+```
+
+**Prop Cleanup**
+
+- Removed all deprecated `*Props` props (`tdProps`, `thProps`, etc.).
+- Consolidated `*El` props into the `el` prop (e.g., `tdEl` → `el`).  
+   **Exception:** `<Column />` retains `thEl` for header customization:
+  ```tsx
+  <Column el={<td />} thEl={<th />} />
+  ```
+  **Element Prop Behavior**
+- `el` now automatically injects `children`. For empty content, pass `null` explicitly:
+  ```tsx
+  <Column el={<td>{null}</td>} /> // Explicit empty content
+  ```
+  _(Ariakit-style [composition][ariakit composition])_
+
+**Accessor Default Change**
+
+- Default `accessor` is no longer `null`. To replicate old behavior:
+  ```tsx
+  // Old:
+  <Column /> // (accessor=null)
+  // New:
+  <Column accessor={null} />
+  ```
+  Omitting `accessor` now passes content down without change.
+
+### Improvements
+
+**Type-Safe Accessors**
+
+- Accessor paths are now validated with TypeScript. Typos trigger immediate feedback:
+
+  ```tsx
+  type Data = { name: { first: string; last: string } };
+
+  <Column<Data> accessor="name.first" />  // ✅ Valid
+  <Column<Data> accessor="name.las" />   // ❌ Error: "Did you mean 'name.last'?"
+  ```
+
+[ariakit composition]: https://ariakit.org/guide/composition
+
 ## [0.5.1](https://github.com/ctablex/core/compare/0.5.0...0.5.1) (2024-07-12)
 
 - add repository to package.json ([9350975](https://github.com/ctablex/core/commit/93509758734028559d668f42f3c55f8f57d8c93c))
@@ -22,7 +90,7 @@ All notable changes to this project will be documented in this file.
 Now components can be customized with xEl prop instead of xProps. It helps for a better type check.
 
 ```tsx
-return <Row TrProps={{ className: 'zebra' }} />;
+return <Row TrProps={{ className: "zebra" }} />;
 // vs
 return (
   <Row
@@ -34,7 +102,7 @@ return (
   />
 );
 // or
-const MyTr = withDefaultChildren('tr');
+const MyTr = withDefaultChildren("tr");
 return <Row trEl={<MyTr className="zebra" />} />;
 ```
 
