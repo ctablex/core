@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 <!-- new release -->
 
+## [0.6.1](https://github.com/ctablex/core/compare/0.6.0...0.6.1) (2025-02-16)
+
+### Core
+
+- Add optional `value` prop to `AccessorContent`, `ArrayContent`, `ObjectContent`
+
 ## [0.6.0](https://github.com/ctablex/core/compare/0.5.1...0.6.0) (2025-02-16)
 
 ### Breaking Changes

@@ -32,6 +32,7 @@ export declare function AccessorContent<V>(
 export declare interface AccessorContentProps<V> {
   accessor: Accessor<V>;
   children?: ReactNode;
+  value?: V;
 }
 
 export declare type AccessorTo<T, R = any> =
@@ -70,6 +71,7 @@ export declare interface ArrayContentProps<V> {
   getKey?: PathAccessorTo<V, string | number> | ArrayGetKey<V>;
   children?: ReactNode;
   join?: ReactNode;
+  value?: ReadonlyArray<V>;
 }
 
 declare type ArrayGetKey<V> = (value: V, index: number) => string | number;
@@ -190,6 +192,7 @@ export declare interface ObjectContentProps<V extends object> {
   getKey?: ObjectGetKey<V>;
   children: ReactNode;
   join?: ReactNode;
+  value?: V;
 }
 
 declare type ObjectGetKey<V extends object> = <K extends keyof V>(

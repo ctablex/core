@@ -13,13 +13,14 @@ export interface ObjectContentProps<V extends object> {
   getKey?: ObjectGetKey<V>;
   children: ReactNode;
   join?: ReactNode;
+  value?: V;
 }
 
 const defaultGetKey: ObjectGetKey<any> = (value, key, index) => key.toString();
 
 export function ObjectContent<V extends object>(props: ObjectContentProps<V>) {
   const { getKey = defaultGetKey, children, join = null } = props;
-  const content = useContent<V>();
+  const content = useContent<V>(props.value);
   const keys = Object.keys(content) as Array<keyof V>;
   return (
     <>

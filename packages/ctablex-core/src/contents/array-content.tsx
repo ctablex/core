@@ -10,6 +10,7 @@ export interface ArrayContentProps<V> {
   getKey?: PathAccessorTo<V, string | number> | ArrayGetKey<V>;
   children?: ReactNode;
   join?: ReactNode;
+  value?: ReadonlyArray<V>;
 }
 
 const defaultChildren = <DefaultContent />;
@@ -20,7 +21,7 @@ export function ArrayContent<V>(props: ArrayContentProps<V>) {
     children = defaultChildren,
     join = null,
   } = props;
-  const content = useContent<V[]>();
+  const content = useContent<ReadonlyArray<V>>(props.value);
   const getKey = (value: V, index: number) => {
     if (!getKeyProps) {
       return index;

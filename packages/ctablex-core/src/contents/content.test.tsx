@@ -255,7 +255,66 @@ describe('content', () => {
     expect(screen.getByTestId('root')).toHaveTextContent('');
   });
 
-  it('should if it used outside', () => {
+  it('should accept value prop', () => {
+    render(
+      <div data-testid="root">
+        <div data-testid="accessor">
+          <AccessorContent value={[1, 2, 3]} accessor={(a) => a.length} />
+        </div>
+        <div data-testid="array">
+          <ArrayContent value={[1, 2, 3]} join=" " />
+        </div>
+        <div data-testid="object">
+          <ObjectContent value={{ name: 'bob', age: 30 }} join="|">
+            <KeyContent />: <DefaultContent />
+          </ObjectContent>
+        </div>
+      </div>,
+    );
+    expect(screen.getByTestId('accessor')).toHaveTextContent('3');
+    expect(screen.getByTestId('array')).toHaveTextContent('1 2 3');
+    expect(screen.getByTestId('object')).toHaveTextContent('name: bob|age: 30');
+  });
+  it('should prefer value prop over context', () => {
+    render(
+      <div data-testid="root">
+        <div data-testid="accessor">
+          <ContentProvider value={[4, 5]}>
+            <AccessorContent value={[1, 2, 3]} accessor={(a) => a.length} />
+            {' vs '}
+            <AccessorContent<number[]> accessor={(a) => a.length} />
+          </ContentProvider>
+        </div>
+        <div data-testid="array">
+          <ContentProvider value={[4, 5, 6]}>
+            <ArrayContent value={[1, 2, 3]} join=" " />
+            {' vs '}
+            <ArrayContent join=" " />
+          </ContentProvider>
+        </div>
+        <div data-testid="object">
+          <ContentProvider value={{ name: 'alice', age: 20 }}>
+            <ObjectContent value={{ name: 'bob', age: 30 }} join="|">
+              <KeyContent />: <DefaultContent />
+            </ObjectContent>
+            {' vs '}
+            <AccessorContent<number[]> accessor={(a) => a.length} />
+            <ObjectContent join="|">
+              <KeyContent />: <DefaultContent />
+            </ObjectContent>
+          </ContentProvider>
+        </div>
+      </div>,
+    );
+
+    expect(screen.getByTestId('accessor').textContent).toBe('3 vs 2');
+    expect(screen.getByTestId('array').textContent).toBe('1 2 3 vs 4 5 6');
+    expect(screen.getByTestId('object').textContent).toBe(
+      'name: bob|age: 30 vs name: alice|age: 20',
+    );
+  });
+
+  it('should throw error if it used outside', () => {
     // @ts-ignore
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<DefaultContent />)).toThrowErrorMatchingInlineSnapshot(
