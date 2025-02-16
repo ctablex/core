@@ -1,10 +1,4 @@
-import {
-  AccessorTo,
-  accessTo,
-  ArrayContent,
-  ContentProvider,
-  useContent,
-} from '@ctablex/core';
+import { AccessorTo, accessTo, ArrayContent } from '@ctablex/core';
 import { ReactNode, useCallback } from 'react';
 import { Row } from './row';
 
@@ -19,7 +13,6 @@ export interface RowsProps<D> {
 export function Rows<D>(props: RowsProps<D>) {
   const keyAccessor = props.keyAccessor;
   const { children = defaultChildren } = props;
-  const rows = useContent(props.rows);
   const getKey = useCallback(
     (data: D, index: number): number | string => {
       if (!keyAccessor) {
@@ -30,8 +23,8 @@ export function Rows<D>(props: RowsProps<D>) {
     [keyAccessor],
   );
   return (
-    <ContentProvider value={rows}>
-      <ArrayContent getKey={getKey}>{children}</ArrayContent>
-    </ContentProvider>
+    <ArrayContent value={props.rows} getKey={getKey}>
+      {children}
+    </ArrayContent>
   );
 }
