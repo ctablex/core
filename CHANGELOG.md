@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 <!-- new release -->
 
+## [0.6.2](https://github.com/ctablex/core/compare/0.6.0...0.6.2) (2025-02-16)
+
+### Table
+
+- reexport `DefaultContent` and `NullableContent`
+
 ## [0.6.1](https://github.com/ctablex/core/compare/0.6.0...0.6.1) (2025-02-16)
 
 ### Core

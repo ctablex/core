@@ -1,7 +1,10 @@
 import { Accessor } from '@ctablex/core';
 import { AccessorTo } from '@ctablex/core';
+import { DefaultContent } from '@ctablex/core';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
+import { NullableContent } from '@ctablex/core';
+import { NullableContentProps } from '@ctablex/core';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 
@@ -42,7 +45,13 @@ export declare interface DataTableProps<D> {
   children: ReactNode;
 }
 
+export { DefaultContent };
+
 export declare const defaultTableElements: TableElements;
+
+export { NullableContent };
+
+export { NullableContentProps };
 
 export declare function Row<R>(props: RowProps<R>): JSX_2.Element;
 
