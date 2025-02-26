@@ -6,11 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## [0.6.3](https://github.com/ctablex/core/compare/0.6.2...0.6.3) (2025-02-26)
+
 ### Changed
 
 - add support for `undefined` accessor. the `undefined` accessor will return value unchanged. 
 
-## [0.6.2](https://github.com/ctablex/core/compare/0.6.0...0.6.2) (2025-02-16)
+## [0.6.2](https://github.com/ctablex/core/compare/0.6.1...0.6.2) (2025-02-16)
 
 ### Table
 
