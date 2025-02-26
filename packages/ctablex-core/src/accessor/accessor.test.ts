@@ -10,6 +10,14 @@ describe('accessor', () => {
     expectTypeOf(access(obj, null)).toEqualTypeOf<null>();
   });
 
+  it('should support undefined accessor', () => {
+    type Obj = { a: number; b: { c: string } };
+
+    const obj: Obj = { a: 5, b: { c: 'd' } };
+    expect(access(obj, undefined)).toBe(obj);
+    expectTypeOf(access(obj, undefined)).toEqualTypeOf<Obj>();
+  });
+
   it('should support path accessor', () => {
     type Obj = { a: number; b: { c: string } };
 

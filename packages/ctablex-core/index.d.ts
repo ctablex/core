@@ -23,7 +23,11 @@ export declare function accessByPathTo<
   K extends PathAccessorTo<T, R> = PathAccessorTo<T, R>,
 >(t: T, path: K): R & PathAccessorValue<T, K>;
 
-export declare type Accessor<T> = null | PathAccessor<T> | FnAccessor<T>;
+export declare type Accessor<T> =
+  | undefined
+  | null
+  | PathAccessor<T>
+  | FnAccessor<T>;
 
 export declare function AccessorContent<V>(
   props: AccessorContentProps<V>,
@@ -36,17 +40,23 @@ export declare interface AccessorContentProps<V> {
 }
 
 export declare type AccessorTo<T, R = any> =
+  | undefined
   | null
   | PathAccessorTo<T, R>
   | FnAccessor<T, R>;
 
-export declare type AccessorValue<T, A extends Accessor<T>> = A extends null
-  ? null
-  : A extends PathAccessor<T>
-    ? PathAccessorValue<T, A>
-    : A extends FnAccessor<T>
-      ? FnAccessorValue<T, A>
-      : never;
+export declare type AccessorValue<
+  T,
+  A extends Accessor<T>,
+> = A extends undefined
+  ? T
+  : A extends null
+    ? null
+    : A extends PathAccessor<T>
+      ? PathAccessorValue<T, A>
+      : A extends FnAccessor<T>
+        ? FnAccessorValue<T, A>
+        : never;
 
 export declare function accessTo<
   R,

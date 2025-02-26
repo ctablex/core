@@ -6,23 +6,30 @@ import {
   PathAccessorValue,
 } from './path-accessor';
 
-export type Accessor<T> = null | PathAccessor<T> | FnAccessor<T>;
+export type Accessor<T> = undefined | null | PathAccessor<T> | FnAccessor<T>;
 export type AccessorTo<T, R = any> =
+  | undefined
   | null
   | PathAccessorTo<T, R>
   | FnAccessor<T, R>;
-export type AccessorValue<T, A extends Accessor<T>> = A extends null
-  ? null
-  : A extends PathAccessor<T>
-    ? PathAccessorValue<T, A>
-    : A extends FnAccessor<T>
-      ? FnAccessorValue<T, A>
-      : never;
+export type AccessorValue<T, A extends Accessor<T>> = A extends undefined
+  ? T
+  : A extends null
+    ? null
+    : A extends PathAccessor<T>
+      ? PathAccessorValue<T, A>
+      : A extends FnAccessor<T>
+        ? FnAccessorValue<T, A>
+        : never;
 
 export function access<T, A extends Accessor<T>>(
   t: T,
   a: A,
 ): AccessorValue<T, A> {
+  if (a === undefined) {
+    // @ts-ignore
+    return t;
+  }
   if (a === null) {
     // @ts-ignore
     return null;
