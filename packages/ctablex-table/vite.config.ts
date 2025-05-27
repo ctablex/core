@@ -8,6 +8,7 @@ import packageJson from './package.json';
 const external = [
   ...Object.keys(packageJson.dependencies ?? {}),
   ...Object.keys(packageJson.peerDependencies ?? {}),
+  'react/jsx-runtime',
 ];
 
 // https://vitejs.dev/config/

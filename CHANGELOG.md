@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Fixes
+
+- remove embedded react in final bundle
+
 ## [0.6.3](https://github.com/ctablex/core/compare/0.6.2...0.6.3) (2025-02-26)
 
 ### Changed
