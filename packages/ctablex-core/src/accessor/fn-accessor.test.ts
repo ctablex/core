@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { accessByFn, FnAccessor } from './fn-accessor';
+import { accessByFn, type FnAccessor } from './fn-accessor';
 
 describe('fn accessor', () => {
   it('should support simple object with inline fn', () => {

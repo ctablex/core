@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { accessByPathTo, PathAccessorTo } from '../accessor/path-accessor';
+import type { ReactNode } from 'react';
+import { accessByPathTo, type PathAccessorTo } from '../accessor/path-accessor';
 import { ContentProvider, useContent } from '../content-provider';
 import { IndexContext } from '../contexts/index-context';
 import { DefaultContent } from './default-content';

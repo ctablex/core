@@ -6,7 +6,7 @@ import { JSXElementConstructor } from 'react';
 import { NullableContent } from '@ctablex/core';
 import { NullableContentProps } from '@ctablex/core';
 import { ReactElement } from 'react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export declare function Column<D = any>(props: ColumnProps<D>): JSX_2.Element;
 

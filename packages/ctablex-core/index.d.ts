@@ -1,6 +1,6 @@
 import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export declare function access<T, A extends Accessor<T>>(
   t: T,

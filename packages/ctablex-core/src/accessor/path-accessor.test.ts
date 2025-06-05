@@ -2,8 +2,8 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import {
   accessByPath,
   accessByPathTo,
-  PathAccessor,
-  PathAccessorTo,
+  type PathAccessor,
+  type PathAccessorTo,
 } from './path-accessor';
 
 function pathAccessor<T>(t: T): PathAccessor<T> {

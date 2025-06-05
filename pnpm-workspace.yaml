@@ -9,19 +9,19 @@ catalog:
     "@testing-library/jest-dom": ^6
     "@testing-library/react": ^16
     "@testing-library/user-event": ^14
-    "@types/node": ^20
-    "@types/react": ^18
-    "@types/react-dom": ^18
+    "@types/node": ^22
+    "@types/react": ^19
+    "@types/react-dom": ^19
     "@vitejs/plugin-react": ^4
     "@vitest/coverage-istanbul": ^3
     eslint: ^8
     eslint-config-react-app: ^7
     husky: ^9.1.7
     jsdom: ^26
-    lint-staged: ^15
+    lint-staged: ^16
     prettier: ^3
-    react: ^18
-    react-dom: ^18
+    react: ^19
+    react-dom: ^19
     typescript: ^5
     vite: ^6
     vite-plugin-dts: ^4

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ContentProvider, useContent } from '../content-provider';
 import { DefaultContent } from './default-content';
 

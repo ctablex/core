@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ContentProvider, useContent } from '../content-provider';
 import { IndexContext } from '../contexts/index-context';
 import { KeyContext } from '../contexts/key-context';

@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { access, AccessorTo, accessTo } from './accessor';
+import { access, type AccessorTo, accessTo } from './accessor';
 
 describe('accessor', () => {
   it('should support null accessor', () => {

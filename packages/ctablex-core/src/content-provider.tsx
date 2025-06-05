@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useMemo } from 'react';
+import { type ReactNode, useContext, useMemo } from 'react';
 import { ContentContext } from './contexts/content-context';
 
 export function useContent<V>(value?: V) {

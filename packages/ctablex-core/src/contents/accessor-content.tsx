@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { access, Accessor } from '../accessor/accessor';
+import type { ReactNode } from 'react';
+import { access, type Accessor } from '../accessor/accessor';
 import { ContentProvider, useContent } from '../content-provider';
 import { DefaultContent } from './default-content';
 

@@ -5,7 +5,7 @@ import {
   DefaultContent,
   useContent,
 } from '@ctablex/core';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const defaultChildren = <DefaultContent />;
 

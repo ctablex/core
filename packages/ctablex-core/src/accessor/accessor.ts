@@ -1,9 +1,9 @@
-import { FnAccessor, FnAccessorValue } from './fn-accessor';
+import type { FnAccessor, FnAccessorValue } from './fn-accessor';
 import {
   accessByPath,
-  PathAccessor,
-  PathAccessorTo,
-  PathAccessorValue,
+  type PathAccessor,
+  type PathAccessorTo,
+  type PathAccessorValue,
 } from './path-accessor';
 
 export type Accessor<T> = undefined | null | PathAccessor<T> | FnAccessor<T>;
