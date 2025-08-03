@@ -34,6 +34,7 @@
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
+    "@arktype/attest": "catalog:",
     "@microsoft/api-extractor": "catalog:",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
