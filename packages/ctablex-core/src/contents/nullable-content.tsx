@@ -8,6 +8,12 @@ export interface NullableContentProps {
 }
 
 const defaultChildren = <DefaultContent />;
+/**
+ * Conditionally renders content based on whether the value is null or undefined.
+ * Renders nullContent when value is null/undefined, otherwise renders children.
+ *
+ * Default children: <DefaultContent />
+ */
 export function NullableContent(props: NullableContentProps) {
   const { nullContent = null, children = defaultChildren } = props;
   const content = useContent();
