@@ -62,6 +62,15 @@ export declare type Accessor<T> =
   | PathAccessor<T>
   | FnAccessor<T>;
 
+/**
+ * Transforms the content value using an accessor, then provides the result to children.
+ * - Path string: Accesses nested properties like "user.address.city"
+ * - Function: Calls the function with the content value
+ * - undefined: Returns the content value unchanged
+ * - null: Returns null
+ *
+ * Default children: <DefaultContent />
+ */
 export declare function AccessorContent<V>(
   props: AccessorContentProps<V>,
 ): JSX_2.Element;
@@ -119,17 +128,30 @@ declare type AllowedIndexes<
     ? AllowedIndexes<Tail, Keys | Tail['length']>
     : Keys;
 
+/**
+ * Iterates over an array, rendering children for each element.
+ * Provides both the array element via ContentProvider and its index via IndexContext.
+ *
+ * Default children: <DefaultContent />
+ */
 export declare function ArrayContent<V>(
   props: ArrayContentProps<V>,
 ): JSX_2.Element;
 
 export declare interface ArrayContentProps<V> {
+  /** Extracts unique key from each element (path or function). Defaults to index. */
   getKey?: PathAccessorTo<V, string | number> | ArrayGetKey<V>;
+  /** Content to render for each element. Defaults to <DefaultContent />. */
   children?: ReactNode;
+  /** Content to render between elements (e.g., commas, separators). */
   join?: ReactNode;
+  /** Array to iterate. If omitted, uses context value. */
   value?: ReadonlyArray<V>;
 }
 
+/**
+ * Function type for extracting a unique key from array elements.
+ */
 declare type ArrayGetKey<V> = (value: V, index: number) => string | number;
 
 declare type ComputeRange<
@@ -173,8 +195,19 @@ export declare interface ContentProviderProps<V> {
   children?: ReactNode;
 }
 
+/**
+ * Renders primitive values (string, number, null, undefined) directly from context.
+ * Used as the default children for most content components.
+ * Only works with primitives - objects and arrays of objects will cause React errors.
+ */
 export declare function DefaultContent(): JSX_2.Element;
 
+/**
+ * Accesses a single field of an object and provides its value to children.
+ * Simplified version of AccessorContent for object properties.
+ *
+ * Default children: <DefaultContent />
+ */
 export declare function FieldContent<V>(
   props: FieldContentProps<V>,
 ): JSX_2.Element;
@@ -236,12 +269,20 @@ export declare type FnAccessorValue<T, F extends FnAccessor<T>> = F extends {
 
 declare type Index40 = ComputeRange<40>[number];
 
+/**
+ * Displays the current array or object iteration index from IndexContext.
+ * Optionally adds a start offset to the index.
+ */
 export declare function IndexContent(props: IndexContentProps): JSX_2.Element;
 
 export declare interface IndexContentProps {
   start?: number;
 }
 
+/**
+ * Context providing the current array or object iteration index.
+ * Used internally by ArrayContent and ObjectContent.
+ */
 export declare const IndexContext: Context<number | undefined>;
 
 declare type IsTuple<T> = T extends readonly any[] & {
@@ -252,8 +293,23 @@ declare type IsTuple<T> = T extends readonly any[] & {
     : never
   : never;
 
+/**
+ * Displays the current object property key from KeyContext.
+ */
 export declare function KeyContent(): JSX_2.Element;
 
+/**
+ * Context providing the current object property key during iteration.
+ * Used internally by ObjectContent.
+ */
+export declare const KeyContext: Context<string | number | symbol | undefined>;
+
+/**
+ * Conditionally renders content based on whether the value is null or undefined.
+ * Renders nullContent when value is null/undefined, otherwise renders children.
+ *
+ * Default children: <DefaultContent />
+ */
 export declare function NullableContent(
   props: NullableContentProps,
 ): JSX_2.Element;
@@ -263,17 +319,28 @@ export declare interface NullableContentProps {
   nullContent?: ReactNode;
 }
 
+/**
+ * Iterates over object properties, rendering children for each key-value pair.
+ * Provides the property value via ContentProvider, key via KeyContext, and index via IndexContext.
+ */
 export declare function ObjectContent<V extends object>(
   props: ObjectContentProps<V>,
 ): JSX_2.Element;
 
 export declare interface ObjectContentProps<V extends object> {
+  /** Generates unique React key for each property. Defaults to property key. */
   getKey?: ObjectGetKey<V>;
+  /** Content to render for each property. */
   children: ReactNode;
+  /** Content to render between properties (e.g., commas, separators). */
   join?: ReactNode;
+  /** Object to iterate. If omitted, uses context value. */
   value?: V;
 }
 
+/**
+ * Function type for generating React keys from object properties.
+ */
 declare type ObjectGetKey<V extends object> = <K extends keyof V>(
   value: V[K],
   key: K,
@@ -343,6 +410,18 @@ declare type PathPrefix<
  */
 export declare function useContent<V>(value?: V): V;
 
+/**
+ * Retrieves the current iteration index from ArrayContent or ObjectContent.
+ * @returns The zero-based iteration index.
+ * @throws Error if called outside an ArrayContent or ObjectContent.
+ */
 export declare function useIndex(): number;
+
+/**
+ * Retrieves the current object property key from ObjectContent.
+ * @returns The property key (string, number, or symbol).
+ * @throws Error if called outside an ObjectContent.
+ */
+export declare function useKey(): string | number | symbol;
 
 export {};

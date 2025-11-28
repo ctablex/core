@@ -4,17 +4,30 @@ import { ContentProvider, useContent } from '../content-provider';
 import { IndexContext } from '../contexts/index-context';
 import { DefaultContent } from './default-content';
 
+/**
+ * Function type for extracting a unique key from array elements.
+ */
 export type ArrayGetKey<V> = (value: V, index: number) => string | number;
 
 export interface ArrayContentProps<V> {
+  /** Extracts unique key from each element (path or function). Defaults to index. */
   getKey?: PathAccessorTo<V, string | number> | ArrayGetKey<V>;
+  /** Content to render for each element. Defaults to <DefaultContent />. */
   children?: ReactNode;
+  /** Content to render between elements (e.g., commas, separators). */
   join?: ReactNode;
+  /** Array to iterate. If omitted, uses context value. */
   value?: ReadonlyArray<V>;
 }
 
 const defaultChildren = <DefaultContent />;
 
+/**
+ * Iterates over an array, rendering children for each element.
+ * Provides both the array element via ContentProvider and its index via IndexContext.
+ *
+ * Default children: <DefaultContent />
+ */
 export function ArrayContent<V>(props: ArrayContentProps<V>) {
   const {
     getKey: getKeyProps,
