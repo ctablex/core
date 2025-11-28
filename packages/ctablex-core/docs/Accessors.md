@@ -545,4 +545,4 @@ type User = {
 - [AccessorContent](./Contents.md#accessorcontent) - Component using accessors
 - [FieldContent](./Contents.md#fieldcontent) - Simplified object field access
 - [Content Context](./ContentContext.md) - Context system foundation
-- [Micro-Context Pattern](../MICRO-CONTEXT.md) - Pattern overview
+- [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview

@@ -227,7 +227,7 @@ Beyond value context, micro-contexts can provide metadata:
 
 ## Real-World Example
 
-Building a table with micro-context:
+Building a table with micro-context (using `@ctablex/table`, which is built on `@ctablex/core`):
 
 ```tsx
 <DataTable data={products}>
