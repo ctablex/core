@@ -83,19 +83,36 @@ declare type ComputeRange<
   ? Result
   : ComputeRange<N, [...Result, Result['length']]>;
 
+/**
+ * The underlying React Context for the micro-context pattern.
+ * @internal This is an internal API and may change in future versions.
+ * Use `ContentProvider` and `useContent` instead.
+ */
 export declare const ContentContext: Context<
   ContentContextType<any> | undefined
 >;
 
+/**
+ * The type of the content context value.
+ * @internal This is an internal API and may change in future versions.
+ */
 export declare type ContentContextType<V> = {
   value: V;
 };
 
+/**
+ * Provides a content context that can be retrieved with useContent.
+ * Providers can be nested to create scoped contexts.
+ */
 export declare function ContentProvider<V>(
   props: ContentProviderProps<V>,
 ): JSX_2.Element;
 
+/**
+ * Props for ContentProvider.
+ */
 export declare interface ContentProviderProps<V> {
+  /** The value to provide via context. */
   value: V;
   children?: ReactNode;
 }
@@ -284,6 +301,12 @@ declare type PathPrefix<
   ? `${TPrefix}.${PathAccessor<T[TPrefix], [...TDepth, any]> & string}`
   : never;
 
+/**
+ * Retrieves the current value from the nearest ContentProvider.
+ * @param value - Optional override value. If provided, returns this value instead of context.
+ * @returns The content value from context or the override value.
+ * @throws Error if called outside a ContentProvider and no override value is provided.
+ */
 export declare function useContent<V>(value?: V): V;
 
 export declare function useIndex(): number;
