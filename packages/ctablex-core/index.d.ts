@@ -2,27 +2,60 @@ import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
+/**
+ * Accesses a value using a path string, function, undefined, or null.
+ * - undefined returns the input unchanged
+ * - null returns null
+ * - string uses accessByPath
+ * - function calls the function with the input
+ * @param t - The object to access
+ * @param a - The accessor (path, function, undefined, or null)
+ * @returns The accessed value
+ */
 export declare function access<T, A extends Accessor<T>>(
   t: T,
   a: A,
 ): AccessorValue<T, A>;
 
+/**
+ * Accesses a value using a custom extraction function.
+ * @param obj - The object to access
+ * @param fn - Function that extracts the value
+ * @returns The result of calling fn with obj
+ */
 export declare function accessByFn<T, F extends FnAccessor<T>>(
   obj: T,
   fn: F,
 ): FnAccessorValue<T, F>;
 
+/**
+ * Accesses a nested property using a dot-separated string path.
+ * Provides full type safety with autocomplete and compile-time error detection.
+ * @param t - The object to access
+ * @param path - Dot-separated path like "user.address.city"
+ * @returns The value at the specified path
+ */
 export declare function accessByPath<T, K extends PathAccessor<T>>(
   t: T,
   path: K,
 ): PathAccessorValue<T, K>;
 
+/**
+ * Accesses a nested property using a path constrained to return a specific type.
+ * Like accessByPath but only accepts paths that return values of type R.
+ * @param t - The object to access
+ * @param path - Dot-separated path that returns type R
+ * @returns The value at the specified path, typed as R
+ */
 export declare function accessByPathTo<
   R,
   T,
   K extends PathAccessorTo<T, R> = PathAccessorTo<T, R>,
 >(t: T, path: K): R & PathAccessorValue<T, K>;
 
+/**
+ * Union type accepting path strings, functions, undefined, or null.
+ */
 export declare type Accessor<T> =
   | undefined
   | null
@@ -39,12 +72,18 @@ export declare interface AccessorContentProps<V> {
   value?: V;
 }
 
+/**
+ * Union type accepting accessors constrained to return a specific type.
+ */
 export declare type AccessorTo<T, R = any> =
   | undefined
   | null
   | PathAccessorTo<T, R>
   | FnAccessor<T, R>;
 
+/**
+ * The type of the value returned by an accessor.
+ */
 export declare type AccessorValue<
   T,
   A extends Accessor<T>,
@@ -58,6 +97,13 @@ export declare type AccessorValue<
         ? FnAccessorValue<T, A>
         : never;
 
+/**
+ * Accesses a value using an accessor constrained to return a specific type.
+ * Like access but only accepts accessors that return values of type R.
+ * @param t - The object to access
+ * @param a - The accessor constrained to return type R
+ * @returns The accessed value, typed as R
+ */
 export declare function accessTo<
   R,
   T,
@@ -138,8 +184,14 @@ export declare interface FieldContentProps<V> {
   children?: ReactNode;
 }
 
+/**
+ * A function that extracts a value from an object.
+ */
 export declare type FnAccessor<T, R = any> = (t: T) => R;
 
+/**
+ * The return type of a function accessor.
+ */
 export declare type FnAccessorValue<T, F extends FnAccessor<T>> = F extends {
   (t: T, ...args: any[]): infer R;
   (t: T, ...args: any[]): any;
@@ -228,6 +280,11 @@ declare type ObjectGetKey<V extends object> = <K extends keyof V>(
   index: number,
 ) => string | number;
 
+/**
+ * String literal type representing valid dot-separated paths through an object.
+ * Supports nested properties up to 5 levels deep.
+ * @example "user.address.city"
+ */
 export declare type PathAccessor<
   T,
   TDepth extends any[] = [],
@@ -246,11 +303,18 @@ export declare type PathAccessor<
             : never) &
   string;
 
+/**
+ * String literal type representing paths through an object that return a specific type.
+ * Filters PathAccessor<T> to only include paths where the value extends R.
+ */
 export declare type PathAccessorTo<T, R> = {
   [K in PathAccessor<T>]: PathAccessorValue<T, K> extends R ? K : never;
 }[PathAccessor<T>] &
   string;
 
+/**
+ * The type of the value at a given path in an object.
+ */
 export declare type PathAccessorValue<T, TProp> = 0 extends 1 & T
   ? any
   : T extends null | undefined
