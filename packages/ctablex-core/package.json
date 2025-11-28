@@ -1,11 +1,31 @@
 {
   "name": "@ctablex/core",
   "version": "0.6.5",
+  "description": "Core building blocks for composable, context-based React components using the micro-context pattern",
+  "keywords": [
+    "react",
+    "context",
+    "composition",
+    "micro-context",
+    "declarative",
+    "typescript"
+  ],
+  "homepage": "https://github.com/ctablex/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctablex/core.git",
+    "directory": "packages/ctablex-core"
+  },
+  "bugs": {
+    "url": "https://github.com/ctablex/core/issues"
+  },
   "files": [
     "src",
     "dist",
     "index.d.ts",
-    "tsdoc-metadata.json"
+    "tsdoc-metadata.json",
+    "README.md",
+    "docs"
   ],
   "license": "MIT",
   "type": "module",

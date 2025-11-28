@@ -230,4 +230,4 @@ function CustomIndexDisplay() {
 - [ObjectContent](./ObjectContent.md) - Iterate over object properties
 - [ContentContext](./ContentContext.md) - Content value context
 - [Accessors](./Accessors.md) - Type-safe value extraction
-- [Micro-Context Pattern](../MICRO-CONTEXT.md) - Pattern overview
+- [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview

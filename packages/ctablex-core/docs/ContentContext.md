@@ -396,7 +396,7 @@ function UserGreeting({ name }: { name?: string }) {
 
 ## Related
 
-- [Micro-Context Pattern](../MICRO-CONTEXT.md) - Pattern overview
+- [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview
 - [FieldContent](./Contents.md#fieldcontent) - Access object fields
 - [ArrayContent](./ArrayContent.md) - Map arrays
 - [DefaultContent](./Contents.md#defaultcontent) - Render primitive values

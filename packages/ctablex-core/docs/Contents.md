@@ -424,4 +424,4 @@ Many content components use `<DefaultContent />` as default children. This cause
 - [ObjectContent](./ObjectContent.md) - Iterate over objects
 - [ContentContext](./ContentContext.md) - Content value context
 - [Accessors](./Accessors.md) - Type-safe value extraction
-- [Micro-Context Pattern](../MICRO-CONTEXT.md) - Pattern overview
+- [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview

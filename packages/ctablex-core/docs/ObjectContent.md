@@ -232,4 +232,4 @@ const settings = {
 - [ArrayContent](./ArrayContent.md) - Iterate over arrays
 - [ContentContext](./ContentContext.md) - Content value context
 - [FieldContent](./Contents.md#fieldcontent) - Access single object field
-- [Micro-Context Pattern](../MICRO-CONTEXT.md) - Pattern overview
+- [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview
