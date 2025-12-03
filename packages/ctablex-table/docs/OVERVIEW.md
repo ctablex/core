@@ -5,11 +5,9 @@
 ## Installation
 
 ```bash
-npm install @ctablex/table @ctablex/core
+npm install @ctablex/table
 # or
-pnpm add @ctablex/table @ctablex/core
-# or
-yarn add @ctablex/table @ctablex/core
+pnpm add @ctablex/table
 ```
 
 ## Quick Start
@@ -29,7 +27,6 @@ function ProductTable() {
       <Columns>
         <Column header="Name" accessor="name" />
         <Column header="Price" accessor="price" />
-        <Column header="In Stock" accessor="inStock" />
       </Columns>
       <Table />
     </DataTable>
@@ -48,45 +45,63 @@ This renders a basic HTML table with three columns. The library handles:
 
 ### Data Flow Through Micro-Context
 
-Instead of passing data through props, **@ctablex/table** uses React Context to flow data through component hierarchies:
+Instead of passing data through props, **@ctablex/table** uses React Context to flow data through component hierarchies.
+
+**What you write:**
 
 ```tsx
 <DataTable data={products}>
-  {/* Provides products array via context */}
   <Columns>
-    {/* Defines column structure */}
-    <Column accessor="name" /> {/* Extracts "name" field */}
+    <Column header="Name" accessor="name" />
+    <Column header="Price" accessor="price" />
   </Columns>
-  <Table /> {/* Renders the table */}
+  <Table />
 </DataTable>
 ```
 
-**Flow:**
+**What actually renders:**
 
-1. `DataTable` provides the data array via context
-2. `Table` iterates over rows, providing each product via context
-3. `Column` uses the accessor to extract the field value
-4. Default content renderer displays the value
+```tsx
+<DataTable data={products}>
+  {/* Columns definitions don't render during the definition phase */}
+  {null}
 
-This pattern enables components to be decoupled - child components don't need to know about parent props.
-
-### Component Hierarchy
-
+  {/* Table expands to its default children */}
+  <Table>
+    <TableHeader>
+      <HeaderRow>
+        {/* Column definitions are rendered as headers */}
+        <Columns>
+          {/* HeaderCell use "header" prop to render <th> */}
+          <Column header="Name" />
+          <Column header="Price" />
+        </Columns>
+      </HeaderRow>
+    </TableHeader>
+    <TableBody>
+      {/* Rows iterates over products array */}
+      <Rows>
+        {/* Each product is provided via context to Row + render <tr> */}
+        <Row>
+          {/* Column definitions are rendered as cells */}
+          <Columns>
+            {/* Accessor extracts "name" field and provide it via context to render <td> */}
+            <Column accessor="name">
+              <DefaultContent />
+            </Column>
+            {/* Accessor extracts "price" field and provide it via context to render <td> */}
+            <Column accessor="price">
+              <DefaultContent />
+            </Column>
+          </Columns>
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
 ```
-DataTable (provides data + column definitions)
-└── Table (renders <table>)
-    ├── TableHeader (renders <thead>)
-    │   └── HeaderRow (renders <tr>)
-    │       └── Columns (renders column headers)
-    │           └── Column (renders <th>)
-    └── TableBody (renders <tbody>)
-        └── Rows (iterates data array)
-            └── Row (provides row data)
-                └── Columns (renders row cells)
-                    └── Column (renders <td>)
-```
 
-Each component has a specific role, and they compose together to build the full table structure.
+This pattern enables components to be **decoupled** - child components access data from context rather than receiving it through props, making them reusable and composable.
 
 ## Custom Content Rendering
 
@@ -179,6 +194,12 @@ const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
     <TableBody>
       {/* Renders main columns for each product */}
       <Rows />
+      {/* Custom row with manual cell definition (not using Columns) */}
+      <Row>
+        <Column el={<td colSpan={2} style={{ textAlign: 'center' }} />}>
+          Custom content spanning multiple columns
+        </Column>
+      </Row>
     </TableBody>
     <TableFooter>
       {/* Renders footer columns with total data */}
@@ -217,6 +238,35 @@ Accessors extract values from row data. They can be:
 <Column accessor={(user) => `${user.firstName} ${user.lastName}`} />
 ```
 
+**No accessor (undefined):**
+
+When `accessor` is omitted, the entire row object is provided to children without extraction. This is useful for complex content using `ContentValue`:
+
+```tsx
+<Column header="Details">
+  <ContentValue accessor="firstName">
+    <DefaultContent />
+  </ContentValue>{' '}
+  <ContentValue accessor="lastName">
+    <DefaultContent />
+  </ContentValue>
+</Column>
+```
+
+⚠️ **Note:** Since the default child is `<DefaultContent />`, omitting the accessor with default children will cause a React error (objects cannot be rendered). For empty cells, pass `{null}` as children or accessor:
+
+```tsx
+{
+  /* Empty cell - option 1: null children */
+}
+<Column header="Actions">{null}</Column>;
+
+{
+  /* Empty cell - option 2: null accessor */
+}
+<Column header="Actions" accessor={null} />;
+```
+
 ### Default Children
 
 Most components have sensible defaults, reducing boilerplate:
@@ -224,6 +274,7 @@ Most components have sensible defaults, reducing boilerplate:
 ```tsx
 // These are equivalent:
 <Table />
+
 <Table>
   <TableHeader />
   <TableBody />
@@ -231,35 +282,11 @@ Most components have sensible defaults, reducing boilerplate:
 
 // These are equivalent:
 <Column accessor="name" />
+
 <Column accessor="name">
   <DefaultContent />
 </Column>
 ```
-
-### Context Nesting
-
-Data flows through nested contexts:
-
-```tsx
-<ContentProvider value={products}>
-  {/* Array context */}
-  <ArrayContent>
-    {/* Iterates array */}
-    <ContentProvider value={product}>
-      {/* Single product context */}
-      <FieldContent field="name">
-        {/* Extracts field */}
-        <ContentProvider value="Laptop">
-          {/* String value context */}
-          <DefaultContent /> {/* Renders "Laptop" */}
-        </ContentProvider>
-      </FieldContent>
-    </ContentProvider>
-  </ArrayContent>
-</ContentProvider>
-```
-
-This is what happens internally when you use `<DataTable>`, `<Table>`, and `<Column>`.
 
 ## Type Safety
 

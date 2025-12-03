@@ -13,8 +13,6 @@ Complete reference for all components in **@ctablex/table**.
 - [Column](#column)
 - [Rows](#rows)
 - [Row](#row)
-- [Cell](#cell)
-- [HeaderCell](#headercell)
 - [Re-exported Components](#re-exported-components)
 
 ---
@@ -79,9 +77,10 @@ Should contain `Columns` definitions and a `Table` component.
 ```tsx
 type Product = { id: number; name: string; price: number };
 
-<DataTable<Product> data={products}>
-  {/* TypeScript knows the row type */}
-</DataTable>;
+{
+  /* TypeScript validates the data prop matches Product[] */
+}
+<DataTable<Product> data={products}>{/* ... */}</DataTable>;
 ```
 
 ---
@@ -452,12 +451,35 @@ Extracts the value from row data. Can be a string path or function.
 <Column accessor={(user) => `${user.firstName} ${user.lastName}`} />
 ```
 
-**No accessor:**
+**No accessor (undefined):**
+
+When `accessor` is omitted, the entire row object is provided to children without extraction. This is useful for complex content using `ContentValue`:
 
 ```tsx
+<Column header="Details">
+  <ContentValue accessor="firstName">
+    <DefaultContent />
+  </ContentValue>{' '}
+  <ContentValue accessor="lastName">
+    <DefaultContent />
+  </ContentValue>
+</Column>
+```
+
+⚠️ **Note:** Since the default child is `<DefaultContent />`, omitting the accessor with default children will cause a React error (objects cannot be rendered). For empty cells, pass `{null}` as children:
+
+```tsx
+{
+  /* Empty cell with null children */
+}
+<Column header="Actions">{null}</Column>;
+
+{
+  /* Or with custom content */
+}
 <Column header="Actions">
   <button>Edit</button>
-</Column>
+</Column>;
 ```
 
 #### `children`
@@ -711,93 +733,6 @@ Override row data. If omitted, uses data from context (provided by `Rows`).
 1. Gets row data from context or `row` prop
 2. Renders `<tr>` element
 3. Provides row data to children via `ContentProvider`
-
----
-
-## Cell
-
-Renders a table data cell (`<td>`).
-
-### Props
-
-```tsx
-interface CellProps<D> {
-  accessor?: Accessor<D>;
-  children?: ReactNode;
-  el?: ReactElement;
-}
-```
-
-#### `accessor`
-
-**Type:** `Accessor<D>` (optional)
-
-Extracts value from row data.
-
-#### `children`
-
-**Type:** `ReactNode`
-
-Content to render inside the cell.
-
-#### `el`
-
-**Type:** `ReactElement` (optional)
-
-Custom element to render instead of `<td>`.
-
-### Usage
-
-**Note:** `Cell` is typically used internally by `Column`. Direct usage is rare.
-
-```tsx
-<Cell accessor="name">
-  <DefaultContent />
-</Cell>
-```
-
-### What It Does
-
-1. Gets row data from context
-2. If `accessor` is provided:
-   - Extracts value using accessor
-   - Provides value to children via `ContentProvider`
-3. Renders `<td>` element with children
-
----
-
-## HeaderCell
-
-Renders a table header cell (`<th>`).
-
-### Props
-
-```tsx
-interface HeaderCellProps {
-  children?: ReactNode;
-  el?: ReactElement;
-}
-```
-
-#### `children`
-
-**Type:** `ReactNode`
-
-Header content.
-
-#### `el`
-
-**Type:** `ReactElement` (optional)
-
-Custom element to render instead of `<th>`.
-
-### Usage
-
-**Note:** `HeaderCell` is typically used internally by `Column`. Direct usage is rare.
-
-```tsx
-<HeaderCell>Product Name</HeaderCell>
-```
 
 ---
 
