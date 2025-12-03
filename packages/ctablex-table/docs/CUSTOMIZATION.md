@@ -98,10 +98,13 @@ Access the current table elements from context:
 ```tsx
 import { useTableElements } from '@ctablex/table';
 
-function CustomCell() {
-  const elements = useTableElements();
-  // elements.td, elements.tr, etc.
-  return <div>Custom cell</div>;
+function CustomCell(props) {
+  const Elements = useTableElements();
+  const onClick = () => {
+    /* handle click */
+  };
+  // Render using provided td element. only add onClick prop.
+  return <Elements.td onClick={onClick}>{props.children}</Elements.td>;
 }
 ```
 
@@ -159,7 +162,7 @@ Override elements for specific component instances.
 **Conditional styling:**
 
 ```tsx
-<Row el={<tr className={item.isActive ? 'active' : 'inactive'} />} />
+<Row el={<tr className="zebra-row" />} />
 ```
 
 ### Priority
@@ -180,7 +183,7 @@ Override elements for specific component instances.
 Use `el` props when:
 
 - Customizing specific components
-- Conditional styling based on data
+- Conditional styling based on data (inside custom components)
 - One-off element modifications
 
 ---
@@ -188,6 +191,8 @@ Use `el` props when:
 ## Custom Content Components
 
 Create reusable content renderers that work with the micro-context pattern.
+
+Most table components (like `Column`, `Table`, `Row`) provide sensible default children to reduce boilerplate. However, these defaults are fully customizable—you can replace them with your own content components to control exactly how data is rendered. This flexibility lets you start with simple, working tables and progressively enhance them with custom rendering logic as needed.
 
 ### Basic Pattern
 
@@ -269,28 +274,6 @@ function BooleanContent({ yes, no }: BooleanContentProps) {
 </Column>
 ```
 
-### Date Formatter
-
-```tsx
-interface DateFormatterProps {
-  format?: 'short' | 'long';
-}
-
-function DateFormatter({ format = 'short' }: DateFormatterProps) {
-  const date = useContent<Date>();
-
-  const formatted =
-    format === 'short' ? date.toLocaleDateString() : date.toLocaleString();
-
-  return <time dateTime={date.toISOString()}>{formatted}</time>;
-}
-
-// Usage
-<Column accessor="createdAt">
-  <DateFormatter format="long" />
-</Column>;
-```
-
 ### Nullable Content
 
 ```tsx
@@ -308,13 +291,16 @@ import { NullableContent, DefaultContent } from '@ctablex/table';
 Content components can be composed:
 
 ```tsx
+import { NullableContent, DefaultContent } from '@ctablex/table';
+import { KeyContent, ObjectContent } from '@ctablex/core';
+
 <Column accessor="metadata">
   <NullableContent nullContent="No data">
-    <ObjectContent>
+    <ObjectContent join=", ">
       <KeyContent />: <DefaultContent />
     </ObjectContent>
   </NullableContent>
-</Column>
+</Column>;
 ```
 
 ### Best Practices
@@ -323,7 +309,6 @@ Content components can be composed:
 2. **Use TypeScript** - Type the expected value with `useContent<T>()`
 3. **Make them reusable** - Accept props for customization
 4. **Handle edge cases** - Null checks, default values
-5. **Memoize when needed** - Use `useMemo` for expensive rendering
 
 ---
 
@@ -439,14 +424,12 @@ function MuiTableProvider({ children }: { children: ReactNode }) {
 ```tsx
 const tailwindElements: TableElements = {
   ...defaultTableElements,
-  table: <table className="min-w-full divide-y divide-gray-200" />,
-  thead: <thead className="bg-gray-50" />,
-  tbody: <tbody className="bg-white divide-y divide-gray-200" />,
+  table: <table className="w-full border-collapse" />,
+  thead: <thead className="bg-gray-100" />,
+  tbody: <tbody className="divide-y divide-gray-200" />,
   tr: <tr className="hover:bg-gray-50" />,
-  th: (
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
-  ),
-  td: <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" />,
+  th: <th className="px-4 py-2 text-left font-medium text-gray-700" />,
+  td: <td className="px-4 py-2 text-gray-900" />,
 };
 
 <TableElementsProvider value={tailwindElements}>
@@ -458,56 +441,147 @@ const tailwindElements: TableElements = {
 
 ## Advanced Customization
 
-### Conditional Row Styling
+### Heatmap Cell Example
+
+Create a custom cell component that renders a heatmap visualization based on cell values. This example uses `useTableElements` to access the default `td` element and add custom styling:
 
 ```tsx
-<Rows>
-  <Row>
-    {(row) => (
-      <Row el={<tr className={row.isActive ? 'active' : 'inactive'} />}>
-        <Columns />
-      </Row>
-    )}
-  </Row>
-</Rows>
-```
+import { useContent, useTableElements } from '@ctablex/table';
 
-**Better approach** - Custom Row component:
-
-```tsx
-function ConditionalRow() {
-  const row = useContent<Item>();
-  return (
-    <Row el={<tr className={row.isActive ? 'active' : 'inactive'} />}>
-      <Columns />
-    </Row>
-  );
+interface HeatmapCellProps {
+  min?: number;
+  max?: number;
+  children?: ReactNode;
 }
 
-<Rows>
-  <ConditionalRow />
-</Rows>;
-```
+function HeatmapCell({ min = 0, max = 100, children }: HeatmapCellProps) {
+  const value = useContent<number>();
+  const Elements = useTableElements();
 
-### Custom Cell Wrappers
+  // Normalize value to 0-1 range
+  const intensity = Math.min(Math.max((value - min) / (max - min), 0), 1);
 
-```tsx
-function ClickableCell({ onClick }: { onClick: () => void }) {
-  const value = useContent();
+  // Convert intensity to color (blue to red gradient)
+  const hue = (1 - intensity) * 240; // 240 (blue) to 0 (red)
+  const backgroundColor = `hsl(${hue}, 70%, 50%)`;
+
   return (
-    <td onClick={onClick} style={{ cursor: 'pointer' }}>
-      {value}
-    </td>
+    <Elements.td
+      style={{ backgroundColor, color: '#fff', textAlign: 'center' }}
+    >
+      {children}
+    </Elements.td>
   );
 }
-
-// Direct usage (not via Column)
-<Row>
-  <ClickableCell onClick={() => alert('Clicked')} />
-</Row>;
 ```
 
-### Merging Props
+**Usage:**
+
+```tsx
+{
+  /* Auto-scale from 0 to 100 */
+}
+{
+  /* use <DefaultContent /> as children */
+}
+<Column header="Score" accessor="score" el={<HeatmapCell />} />;
+
+{
+  /* Custom range */
+}
+<Column header="Price" accessor="price" el={<HeatmapCell min={10} max={50} />}>
+  <PriceFormatter />
+</Column>;
+```
+
+**Key points:**
+
+- Uses `useTableElements()` to get the default `td` element
+- Accesses cell value via `useContent<number>()`
+- Props passed to the `el` element are accessible in the component
+- Children are rendered inside the styled cell
+
+### Selectable Row Example
+
+```tsx
+import { useTableElements } from '@ctablex/table';
+
+const defaultChildren = <Columns/>;
+function SelectableRow(props) {
+  const { children = defaultChildren } = props;
+  const content = useContent<{id: string}>();
+  const Elements = useTableElements();
+  const [selected, setSelected] = useSelectedState(); // get selection state from context
+  const onClick = () => {
+    setSelected((prev) => (prev === content.id ? null : content.id);
+  };
+  const isSelected = selected === content.id;
+  return <Elements.tr onClick={onClick} className={isSelected ? 'selected' : ''}>{children}</Elements.tr>;
+}
+```
+
+```tsx
+// micro context style selection state management
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  ReactElement,
+  useMemo,
+} from 'react';
+type SelectState = [
+  string | null,
+  React.Dispatch<React.SetStateAction<string | null>>,
+];
+const SelectStateContext = createContext<SelectState | undefined>(undefined);
+
+function useSelectedState() {
+  const context = useContext(SelectStateContext);
+  if (!context) {
+    throw new Error(
+      'useSelectedState must be used within a SelectStateProvider',
+    );
+  }
+  return context;
+}
+
+function SelectStateProvider({ children }: { children: ReactNode }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const state = useMemo(
+    () => [selectedId, setSelectedId] as SelectState,
+    [selectedId],
+  );
+  return (
+    <SelectStateContext.Provider value={state}>
+      {children}
+    </SelectStateContext.Provider>
+  );
+}
+```
+
+### Usage
+
+```tsx
+<SelectStateProvider>
+  <DataTable data={items}>
+    <Columns>
+      <Column header="Name" accessor="name" />
+      <Column header="Price" accessor="price" />
+    </Columns>
+    <Table>
+      <TableHeader />
+      <TableBody>
+        <Rows>
+          <SelectableRow />
+        </Rows>
+      </TableBody>
+    </Table>
+  </DataTable>
+</SelectStateProvider>
+```
+
+## Merging Props
 
 The library uses `addProps` utility internally to merge props:
 
@@ -518,7 +592,7 @@ function addProps(el: ReactElement, props: Record<string, any>) {
 }
 ```
 
-This allows components to add props (like `children`) while preserving user-provided props (from `el`).
+This allows components to add props (like `children`) while preserving user-provided props (from `el`). props from el has higher priority.
 
 **Your element props always win:**
 
@@ -528,41 +602,6 @@ This allows components to add props (like `children`) while preserving user-prov
   el={<td className="my-class" />} // Your class is preserved
 />
 // Renders: <td className="my-class">content</td>
-```
-
-### Building Your Own Table Component
-
-Create a wrapper that provides custom elements by default:
-
-```tsx
-import {
-  DataTable as BaseDataTable,
-  DataTableProps,
-  TableElementsProvider,
-  defaultTableElements,
-} from '@ctablex/table';
-
-const myElements: TableElements = {
-  ...defaultTableElements,
-  table: <table className="my-app-table" />,
-  td: <td className="my-app-cell" />,
-};
-
-export function DataTable<D>(props: DataTableProps<D>) {
-  return (
-    <TableElementsProvider value={myElements}>
-      <BaseDataTable {...props} />
-    </TableElementsProvider>
-  );
-}
-
-// Now all tables use your elements
-<DataTable data={items}>
-  <Columns>
-    <Column header="Name" accessor="name" />
-  </Columns>
-  <Table />
-</DataTable>;
 ```
 
 ---
