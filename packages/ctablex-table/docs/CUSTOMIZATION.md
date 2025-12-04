@@ -186,6 +186,29 @@ Use `el` props when:
 - Conditional styling based on data (inside custom components)
 - One-off element modifications
 
+### Merging Props
+
+Both `TableElementsProvider` and `el` props use the same internal mechanism to merge props. The library uses `addProps` utility to combine element props:
+
+```tsx
+// Internal mechanism
+function addProps(el: ReactElement, props: Record<string, any>) {
+  return cloneElement(cloneElement(el, props), el.props);
+}
+```
+
+This allows components to add props (like `children`) while preserving user-provided props. **Your element props always have priority:**
+
+```tsx
+<Column
+  accessor="name"
+  el={<td className="my-class" />} // Your class is preserved
+/>
+// Renders: <td className="my-class">content</td>
+```
+
+The same merging behavior applies to elements from `TableElementsProvider`.
+
 ---
 
 ## Custom Content Components
@@ -503,37 +526,44 @@ function HeatmapCell({ min = 0, max = 100, children }: HeatmapCellProps) {
 
 ### Selectable Row Example
 
-```tsx
-import { useTableElements } from '@ctablex/table';
+Create an interactive table with selectable rows. This example demonstrates how to build a custom `Row` component that manages selection state through a micro-context pattern, allowing users to click rows to select/deselect them:
 
-const defaultChildren = <Columns/>;
+```tsx
+import { useContent, useTableElements } from '@ctablex/table';
+
+const defaultChildren = <Columns />;
+
 function SelectableRow(props) {
   const { children = defaultChildren } = props;
-  const content = useContent<{id: string}>();
+  const content = useContent<{ id: string }>();
   const Elements = useTableElements();
   const [selected, setSelected] = useSelectedState(); // get selection state from context
+
   const onClick = () => {
-    setSelected((prev) => (prev === content.id ? null : content.id);
+    setSelected((prev) => (prev === content.id ? null : content.id));
   };
+
   const isSelected = selected === content.id;
-  return <Elements.tr onClick={onClick} className={isSelected ? 'selected' : ''}>{children}</Elements.tr>;
+
+  return (
+    <Elements.tr onClick={onClick} className={isSelected ? 'selected' : ''}>
+      {children}
+    </Elements.tr>
+  );
 }
 ```
 
+**Selection state management** using the micro-context pattern:
+
 ```tsx
-// micro context style selection state management
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  ReactElement,
-  useMemo,
-} from 'react';
+// micro-context style selection state management
+import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+
 type SelectState = [
   string | null,
   React.Dispatch<React.SetStateAction<string | null>>,
 ];
+
 const SelectStateContext = createContext<SelectState | undefined>(undefined);
 
 function useSelectedState() {
@@ -560,7 +590,7 @@ function SelectStateProvider({ children }: { children: ReactNode }) {
 }
 ```
 
-### Usage
+**Usage:**
 
 ```tsx
 <SelectStateProvider>
@@ -581,28 +611,13 @@ function SelectStateProvider({ children }: { children: ReactNode }) {
 </SelectStateProvider>
 ```
 
-## Merging Props
+**Key points:**
 
-The library uses `addProps` utility internally to merge props:
-
-```tsx
-// Internal mechanism
-function addProps(el: ReactElement, props: Record<string, any>) {
-  return cloneElement(cloneElement(el, props), el.props);
-}
-```
-
-This allows components to add props (like `children`) while preserving user-provided props (from `el`). props from el has higher priority.
-
-**Your element props always win:**
-
-```tsx
-<Column
-  accessor="name"
-  el={<td className="my-class" />} // Your class is preserved
-/>
-// Renders: <td className="my-class">content</td>
-```
+- Uses `useTableElements()` to get the default `tr` element
+- Accesses row data via `useContent()` to get the row's `id`
+- Custom context (`SelectStateProvider`) manages selection state
+- Toggle selection on click, apply CSS class based on selection state
+- Demonstrates the micro-context pattern for managing UI state
 
 ---
 
