@@ -2,8 +2,19 @@
 
 This document explains the internal architecture and mechanics of **@ctablex/table**. Understanding these concepts will help you understand how the library processes your components and how data flows through the system.
 
+## Prerequisites
+
+Before diving into this document, you should understand the **micro-context pattern** that powers ctablex. Read **[@ctablex/core MICRO-CONTEXT.md](../../ctablex-core/docs/MICRO-CONTEXT.md)** to learn about:
+
+- How context flows data through component hierarchies
+- The `ContentProvider` and `useContent` pattern
+- Why this approach enables composable, decoupled components
+
+This foundation is essential for understanding how ctablex/table works.
+
 ## Table of Contents
 
+- [High-Level Overview](#high-level-overview)
 - [Column Extraction and Provision](#column-extraction-and-provision)
 - [Column Behavior: Definition vs Rendering](#column-behavior-definition-vs-rendering)
 - [Component Expansion and Default Children](#component-expansion-and-default-children)
@@ -11,9 +22,9 @@ This document explains the internal architecture and mechanics of **@ctablex/tab
 
 ---
 
-<!-- first mention that user should read micro context in ctablex/core first -->
+## High-Level Overview
 
-<!-- example table here -->
+Let's start with a concrete example showing the transformation from what you write to what actually renders.
 
 **What you write:**
 
@@ -37,38 +48,37 @@ This document explains the internal architecture and mechanics of **@ctablex/tab
   {/* Columns definitions don't render during the definition phase */}
   {null}
 
-  {/* Table expands to its default children */}
-  {/* Table renders table */}
+  {/* Table expands to default children and renders <table> element */}
   <Table>
-  {/* HeaderRow renders tr */}
+    {/* TableHeader sets part context: HEADER_PART and renders <thead> */}
     <TableHeader>
-      {/* Provided part: __HEADER__ by TableHeader */}
-
-      {/* HeaderRow renders tr */}
+      {/* HeaderRow renders <tr> */}
       <HeaderRow>
-        {/* Column render as HeaderCell because __HEADER__ is provided as part context */}
+        {/* Columns now renders because we're in HEADER_PART */}
         <Columns>
-          {/* HeaderCell renders th */}
+          {/* Column components detect HEADER_PART and render as HeaderCell */}
           <HeaderCell>Name</HeaderCell>
           <HeaderCell>Price</HeaderCell>
         </Columns>
       </HeaderRow>
     </TableHeader>
-    {/* Body renders tbody */}
+    {/* TableBody sets part context: BODY_PART and renders <tbody> */}
     <TableBody>
-      {/* Provided part: __BODY__ by TableBody */}
-      {/* Rows iterates over products array and provide each product via context */}
+      {/* Rows iterates over products array, providing each via ContentProvider */}
       <Rows>
         {/* Each product is provided via context to Row + render <tr> */}
         <Row>
+          {/* Columns renders again, but in BODY_PART context */}
+          {/* Column components detect BODY_PART and render as Cell */}
           <Columns>
-            {/* Column render as Cell because __BODY__ is provided as part context */}
+            {/* Cell extracts "name" field and provides it via ContentProvider */}
             <Cell accessor="name">
-              {/* DefaultContent is default children of columns */}
+              {/* DefaultContent is the default child of Column */}
               <DefaultContent />
             </Cell>
-            {/* Cell renders td + provide price via context */}
+            {/* Cell extracts "price" field and provides it via ContentProvider */}
             <Cell accessor="price">
+              {/* NumberContent gets value from content context and formats the price */}
               <NumberContent digits={2} /> dollars
             </Cell>
           </Columns>
@@ -79,25 +89,29 @@ This document explains the internal architecture and mechanics of **@ctablex/tab
 </DataTable>
 ```
 
-### DataTable
+This example demonstrates the four key systems we'll explore:
 
-<!--
-data table has two rule.
-first extract columns and provide columns via context for children
-provide data via content context for children
- -->
+1. **Column Extraction**: `Columns` are extracted from DataTable children and stored in context
+2. **Part-Based Rendering**: Same `Column` definitions render differently based on context (header vs body)
+3. **Default Children**: `<Table />` automatically expands to header + body structure
+4. **Element System**: Components render appropriate HTML elements (`<table>`, `<th>`, `<td>`, etc.)
 
-When `DataTable` renders, it extracts all `Columns` components from its immediate children:
+---
 
-<!-- it detects columns children by __COLUMNS__ marker -->
+## Column Extraction and Provision
 
-**Important:** This is why `Columns` must be **immediate children** of `DataTable`. Columns wrapped in fragments or custom components won't be detected unless those components are marked with `__COLUMNS__ = true`.
+The column system uses a two-phase approach: **definition** (extraction) and **rendering**.
 
-The column system is at the heart of ctablex/table. It uses a two-phase approach: **definition** and **rendering**.
+### DataTable: Extraction and Context Setup
+
+`DataTable` has two primary responsibilities:
+
+1. **Extract column definitions** from its immediate children
+2. **Provide data** via ContentProvider for the entire table
 
 ### The `__COLUMNS__` Marker
 
-`Columns` components are identified using a static property marker:
+Columns are detected using a static property marker. This allows `DataTable` to identify `Columns` components during extraction:
 
 ```tsx
 // In src/columns/columns.tsx
@@ -105,10 +119,9 @@ export function Columns(props: ColumnsProps) {
   // ... implementation
 }
 
+// Static marker for identification
 Columns.__COLUMNS__ = true;
 ```
-
-This marker allows the library to distinguish `Columns` components from other React elements during the column extraction phase.
 
 The type checking is done via:
 
@@ -123,63 +136,88 @@ export function isColumnsType(type: any): type is ColumnsType {
 }
 ```
 
+The `findColumns` utility uses this marker to extract only `Columns` components:
+
+```tsx
+// In src/columns/utils.ts
+export function findColumns(children: ReactNode): ReactNode {
+  return Children.map(children, (child): ReactNode => {
+    if (isValidElement(child) && isColumnsType(child.type)) {
+      return child;
+    }
+    return null;
+  });
+}
+```
+
+**Important:** This is why `Columns` must be **immediate children** of `DataTable`. Columns wrapped in fragments or custom components won't be detected unless those components are marked with `__COLUMNS__ = true`.
+
+**Examples:**
+
+```tsx
+// ✓ OK - Columns is immediate child
+<DataTable data={items}>
+  <Columns>
+    <Column header="Name" accessor="name" />
+  </Columns>
+  <Table />
+</DataTable>
+
+// ✗ NOT OK - Columns wrapped in fragment
+<DataTable data={items}>
+  <>
+    <Columns>
+      <Column header="Name" accessor="name" />
+    </Columns>
+  </>
+  <Table />
+</DataTable>
+
+// ✗ NOT OK - Columns wrapped in custom component (unless marked)
+<DataTable data={items}>
+  <MyColumns /> {/* Won't be detected */}
+  <Table />
+</DataTable>
+
+// ✓ OK - Custom wrapper marked with __COLUMNS__
+function MyColumns() {
+  return (
+    <Columns>
+      <Column header="Name" accessor="name" />
+    </Columns>
+  );
+}
+MyColumns.__COLUMNS__ = true; // Mark as column container
+
+<DataTable data={items}>
+  <MyColumns /> {/* Now works! */}
+  <Table />
+</DataTable>
+```
+
 ### ColumnsContext
 
 The extracted columns are provided to the component tree via `ColumnsContext`:
 
-```tsx
-// In src/columns/columns-context.tsx
-export const ColumnsContext = createContext<ReactNode>(null);
-
-export function useColumns() {
-  return useContext(ColumnsContext);
-}
-
-export function ColumnsProvider(props: ColumnsProviderProps) {
-  return (
-    <ColumnsContext.Provider value={props.value}>
-      {props.children}
-    </ColumnsContext.Provider>
-  );
-}
-```
-
 Any component in the tree can access the extracted column definitions by calling `useColumns()`.
-
----
 
 ## Column Behavior: Definition vs Rendering
 
-`Columns` components behave differently depending on the current "part" context.
+`Columns` components behave differently depending on the current "part" context. This dual behavior is what enables the same column definitions to render as headers in `<thead>` and data cells in `<tbody>`.
 
-### Part Context
+### Part Context System
 
-The library uses a `PartContext` to track which section of the table is currently rendering:
-
-```tsx
-// In src/columns/part-context.tsx
-export const PartContext = createContext<string>('');
-
-export function usePart() {
-  return useContext(PartContext);
-}
-
-export function PartProvider(props: PartProviderProps) {
-  return (
-    <PartContext.Provider value={props.value}>
-      {props.children}
-    </PartContext.Provider>
-  );
-}
-```
+The library uses `PartContext` to track which section of the table is currently rendering:
 
 ### Definition Phase
 
 When `DataTable` renders, it sets the part to `DEFINITION_PART`:
 
 ```tsx
+// In src/data-table.tsx
 export const DEFINITION_PART = '__DEFINITION__';
 
+// DataTable wraps children in DEFINITION_PART context
 <PartProvider value={DEFINITION_PART}>
   <ColumnsProvider value={columns}>{children}</ColumnsProvider>
 </PartProvider>;
@@ -209,11 +247,13 @@ export function Columns(props: ColumnsProps) {
 }
 ```
 
-This is why you see `Columns` at the top level of `DataTable` but they don't render - they're only used for extraction.
+**This is crucial**: You see `<Columns>` at the top level of `DataTable`, but they don't render. They're only used for extraction and storage in context. The actual rendering happens later when components like `TableHeader` and `TableBody` request them.
 
 ### Rendering Phase
 
-When table components render (e.g., `TableHeader`, `TableBody`), they set different part contexts:
+When table components render (e.g., `TableHeader`, `TableBody`), they set different part contexts. This tells `Column` components how to render themselves.
+
+**TableHeader sets `HEADER_PART`:**
 
 ```tsx
 // In src/table/table-header.tsx
@@ -223,9 +263,13 @@ export function TableHeader(props: TableHeaderProps) {
   const { children = defaultChildren } = props;
   const elements = useTableElements();
   const el = addProps(props.el ?? elements.thead, { children });
+
+  // Wrap children in HEADER_PART context
   return <PartProvider value={HEADER_PART}>{el}</PartProvider>;
 }
 ```
+
+**TableBody sets `BODY_PART`:**
 
 ```tsx
 // In src/table/table-body.tsx
@@ -235,13 +279,33 @@ export function TableBody(props: TableBodyProps) {
   const { children = defaultChildren } = props;
   const elements = useTableElements();
   const el = addProps(props.el ?? elements.tbody, { children });
+
+  // Wrap children in BODY_PART context
   return <PartProvider value={BODY_PART}>{el}</PartProvider>;
 }
 ```
 
+**TableFooter sets `FOOTER_PART`:**
+
+```tsx
+// In src/table/table-footer.tsx
+export const FOOTER_PART = '__FOOTER__';
+
+export function TableFooter(props: TableFooterProps) {
+  const { children = defaultChildren } = props;
+  const elements = useTableElements();
+  const el = addProps(props.el ?? elements.tfoot, { children });
+
+  // Wrap children in FOOTER_PART context
+  return <PartProvider value={FOOTER_PART}>{el}</PartProvider>;
+}
+```
+
+These part contexts are what enable the same `Column` definition to render differently in different sections of the table.
+
 ### Column Rendering by Part
 
-When `<Columns />` or `<Columns part="summary" />` renders in a non-definition context, it filters the extracted columns by part:
+When `<Columns />` or `<Columns part="summary" />` renders in a non-definition context, it filters the extracted columns by the `part` prop:
 
 ```tsx
 // In src/columns/utils.ts
@@ -251,6 +315,7 @@ export function findColumnsByPart(
 ): ReactNode {
   return Children.map(columns, (child) => {
     if (isValidElement(child)) {
+      // Match columns by part prop
       if (child.props.part === part) {
         return child.props.children;
       }
@@ -260,26 +325,29 @@ export function findColumnsByPart(
 }
 ```
 
-This allows different sections of the table to render different column sets:
+This allows different sections of the table to render different column sets - perfect for summary rows, footers, or multi-part tables:
 
 ```tsx
 <DataTable data={items}>
-  {/* Definition: extracted and stored in context */}
+  {/* Default columns (part=undefined) */}
   <Columns>
     <Column header="Name" accessor="name" />
     <Column header="Price" accessor="price" />
   </Columns>
 
+  {/* Footer columns (part="footer") */}
   <Columns part="footer">
     <Column>Total:</Column>
-    <Column accessor="total" />
+    <Column accessor="total">
+      <NumberContent />
+    </Column>
   </Columns>
 
   <Table>
     <TableBody>
       <Rows>
         <Row>
-          {/* Renders main columns (part=undefined) */}
+          {/* Renders default columns (part=undefined) */}
           <Columns />
         </Row>
       </Rows>
@@ -294,22 +362,31 @@ This allows different sections of the table to render different column sets:
 </DataTable>
 ```
 
+**How it works:**
+
+1. DataTable extracts **all** `Columns` (both default and `part="footer"`)
+2. `<Columns />` in the body row renders only columns with `part=undefined`
+3. `<Columns part="footer" />` in the footer row renders only columns with `part="footer"`
+4. Each renders the appropriate cell structure for its section
+
 ### Column Component Dual Behavior
 
-`Column` components also behave differently based on part context:
+The `Column` component is smart - it checks the current part context and renders differently:
 
 ```tsx
 // In src/columns/column.tsx
+const defaultChildren = <DefaultContent />;
+
 export function Column<D = any>(props: ColumnProps<D>) {
   const { children = defaultChildren } = props;
   const part = usePart();
 
-  // In header context, render header cell
+  // In HEADER_PART context, render as a header cell
   if (part === HEADER_PART) {
     return <HeaderCell el={props.thEl}>{props.header}</HeaderCell>;
   }
 
-  // In body/footer context, render data cell
+  // In BODY_PART or FOOTER_PART context, render as a data cell
   return (
     <Cell accessor={props.accessor} el={props.el}>
       {children}
@@ -318,7 +395,26 @@ export function Column<D = any>(props: ColumnProps<D>) {
 }
 ```
 
-This single component definition creates both header cells (`<th>`) and data cells (`<td>`) depending on where it's rendered.
+This single component definition creates both:
+
+- **Header cells** (`<th>`) when rendered in `TableHeader`
+- **Data cells** (`<td>`) when rendered in `TableBody` or `TableFooter`
+
+**Example flow:**
+
+```tsx
+<Column header="Name" accessor="name" />
+
+// When rendered in TableHeader (HEADER_PART):
+<HeaderCell el={undefined}>Name</HeaderCell>
+// → Renders: <th>Name</th>
+
+// When rendered in TableBody (BODY_PART):
+<Cell accessor="name">
+  <DefaultContent />
+</Cell>
+// → Renders: <td>{extractedValue}</td>
+```
 
 ---
 
@@ -510,7 +606,9 @@ Starting with this minimal code:
 </DataTable>
 ```
 
-**First expansion** (Table default children):
+Let's see how it expands step by step:
+
+**Step 1: Table expands to default children**
 
 ```tsx
 <DataTable data={products}>
@@ -519,13 +617,14 @@ Starting with this minimal code:
     <Column header="Price" accessor="price" />
   </Columns>
   <Table>
+    {/* Table defaults expanded: */}
     <TableHeader />
     <TableBody />
   </Table>
 </DataTable>
 ```
 
-**Second expansion** (TableHeader and TableBody default children):
+**Step 2: TableHeader and TableBody expand**
 
 ```tsx
 <DataTable data={products}>
@@ -535,16 +634,18 @@ Starting with this minimal code:
   </Columns>
   <Table>
     <TableHeader>
+      {/* TableHeader default: */}
       <HeaderRow />
     </TableHeader>
     <TableBody>
+      {/* TableBody default: */}
       <Rows />
     </TableBody>
   </Table>
 </DataTable>
 ```
 
-**Third expansion** (HeaderRow and Rows default children):
+**Step 3: HeaderRow and Rows expand**
 
 ```tsx
 <DataTable data={products}>
@@ -555,11 +656,13 @@ Starting with this minimal code:
   <Table>
     <TableHeader>
       <HeaderRow>
+        {/* HeaderRow default: */}
         <Columns />
       </HeaderRow>
     </TableHeader>
     <TableBody>
       <Rows>
+        {/* Rows default: */}
         <Row />
       </Rows>
     </TableBody>
@@ -567,7 +670,7 @@ Starting with this minimal code:
 </DataTable>
 ```
 
-**Fourth expansion** (Row default children):
+**Step 4: Row expands**
 
 ```tsx
 <DataTable data={products}>
@@ -584,6 +687,7 @@ Starting with this minimal code:
     <TableBody>
       <Rows>
         <Row>
+          {/* Row default: */}
           <Columns />
         </Row>
       </Rows>
@@ -592,13 +696,85 @@ Starting with this minimal code:
 </DataTable>
 ```
 
-This is the final, fully-expanded structure that actually renders.
+**Final: What actually executes**
+
+Now with part contexts and element rendering:
+
+```tsx
+<DataTable data={products}>
+  {/* Part: DEFINITION_PART - Columns returns null */}
+
+  <table>
+    {/* Part: HEADER_PART */}
+    <thead>
+      <tr>
+        {/* Columns renders, Column detects HEADER_PART */}
+        <th>Name</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+
+    {/* Part: BODY_PART */}
+    <tbody>
+      {/* Rows iterates products, each iteration: */}
+      <tr>
+        {/* Columns renders, Column detects BODY_PART */}
+        <td>{name value}</td>
+        <td>{price value}</td>
+      </tr>
+    </tbody>
+  </table>
+</DataTable>
+```
+
+This is the complete transformation from your concise code to what actually renders!
 
 ---
 
 ## Element Rendering System
 
-The element rendering system provides flexibility for customizing HTML elements or swapping in UI library components (like Material-UI).
+The element rendering system provides flexibility for customizing HTML elements or swapping in UI library components (like Material-UI). It uses a priority-based resolution system.
+
+### How Elements Are Resolved
+
+When a component needs to render an element, it follows this priority order:
+
+1. **`el` prop** (highest priority) - Explicitly passed element
+2. **Element from context** - Provided by `TableElementsProvider`
+3. **Default element** (lowest priority) - Standard HTML element
+
+**Example in the `Table` component:**
+
+```tsx
+// In src/table/table.tsx
+export function Table(props: TableProps) {
+  const { children = defaultChildren } = props;
+  const elements = useTableElements(); // Get elements from context
+
+  // Priority: props.el > context element > default
+  return addProps(props.el ?? elements.table, { children });
+}
+```
+
+**Example in the `Cell` component:**
+
+```tsx
+// In src/table/cell.tsx
+export function Cell<D>(props: CellProps<D>) {
+  const content = useContent<D>();
+  const contextEl = useTableElements(); // Get elements from context
+  const { accessor, children } = props;
+
+  // Priority: props.el > context element (td)
+  const el = addProps(props.el ?? contextEl.td, { children });
+
+  if (accessor === undefined) {
+    return el;
+  }
+  const value = access(content, accessor);
+  return <ContentProvider value={value}>{el}</ContentProvider>;
+}
+```
 
 ### TableElements Context
 
@@ -610,18 +786,6 @@ export const TableElementsContext = createContext<TableElements | undefined>(
   undefined,
 );
 
-export function useTableElements() {
-  const context = useContext(TableElementsContext);
-  return context ?? defaultTableElements;
-}
-
-export function TableElementsProvider(props: TableElementsProviderProps) {
-  return (
-    <TableElementsContext.Provider value={props.value}>
-      {props.children}
-    </TableElementsContext.Provider>
-  );
-}
 ```
 
 ### Default Elements
@@ -692,40 +856,73 @@ export function Cell<D>(props: CellProps<D>) {
 
 ### Props Merging with addProps
 
-The `addProps` utility is crucial for merging props from context elements with children:
+The `addProps` utility is crucial for merging props. It ensures that:
+
+- New props (like children) are added to the element
+- Original props from the element are preserved
+- **Original props take precedence** over new props
 
 ```tsx
 // In src/utils/add-props.ts
 import { cloneElement, ReactElement } from 'react';
 
 export function addProps(el: ReactElement, props: Record<string, any>) {
+  // Clone twice: first with new props, then with original props
   return cloneElement(cloneElement(el, props), el.props);
 }
 ```
 
-This function:
+**How it works:**
 
-1. First clones the element with new props (children)
-2. Then clones again with the original props
-
-The result is that:
-
-- Children are added to the element
-- Original props from the element are preserved
-- Original props take precedence over new props
+1. **First `cloneElement`**: Clones element with new props (e.g., `children`)
+2. **Second `cloneElement`**: Clones again with original props, which override the new ones
 
 **Example:**
 
 ```tsx
 const el = <td className="custom" align="right" />;
-const newEl = addProps(el, { children: 'Hello', className: 'default' });
+const newEl = addProps(el, {
+  children: 'Hello',
+  className: 'default', // This will be overridden
+});
+
 // Result: <td className="custom" align="right">Hello</td>
-// Note: className="custom" is preserved, children is added
+// ✓ className="custom" is preserved (original wins)
+// ✓ children="Hello" is added (new value)
+// ✗ className="default" is ignored (original takes precedence)
+```
+
+**Why this matters:**
+
+This allows you to provide elements with custom props in context or as `el` props, and those props are preserved even when the library adds children or other props internally.
+
+```tsx
+// Context element with custom props
+const muiElements = {
+  td: <TableCell align="right" sx={{ fontWeight: 'bold' }} />,
+};
+
+<TableElementsProvider value={muiElements}>
+  <DataTable data={items}>
+    <Columns>
+      <Column accessor="price">
+        {/* The td will render as: */}
+        {/* <TableCell align="right" sx={{ fontWeight: 'bold' }}>...</TableCell> */}
+        <NumberContent />
+      </Column>
+    </Columns>
+    <Table />
+  </DataTable>
+</TableElementsProvider>;
 ```
 
 ### Customization Patterns
 
-**Pattern 1: Provider for entire table**
+There are three main ways to customize elements:
+
+**Pattern 1: Provider for entire table (global customization)**
+
+Use `TableElementsProvider` to apply custom elements to all tables within:
 
 ```tsx
 import { TableElementsProvider } from '@ctablex/table';
@@ -747,17 +944,23 @@ const muiElements = {
   td: <TableCell />,
 };
 
-<TableElementsProvider value={muiElements}>
-  <DataTable data={items}>
-    <Columns>
-      <Column header="Name" accessor="name" />
-    </Columns>
-    <Table />
-  </DataTable>
-</TableElementsProvider>;
+function App() {
+  return (
+    <TableElementsProvider value={muiElements}>
+      <DataTable data={items}>
+        <Columns>
+          <Column header="Name" accessor="name" />
+        </Columns>
+        <Table />
+      </DataTable>
+    </TableElementsProvider>
+  );
+}
 ```
 
-**Pattern 2: Per-component `el` prop**
+**Pattern 2: Per-component `el` prop (targeted customization)**
+
+Override specific elements using the `el` prop:
 
 ```tsx
 <DataTable data={items}>
@@ -765,7 +968,7 @@ const muiElements = {
     <Column
       header="Price"
       accessor="price"
-      el={<td className="price-cell" />}
+      el={<td className="price-cell" style={{ textAlign: 'right' }} />}
       thEl={<th className="price-header" />}
     />
   </Columns>
@@ -776,15 +979,23 @@ const muiElements = {
 </DataTable>
 ```
 
-**Pattern 3: Mixed approach**
+**Pattern 3: Mixed approach (context + selective overrides)**
+
+Use context for most elements, but override specific ones:
 
 ```tsx
-// Use context for most elements
 <TableElementsProvider value={muiElements}>
   <DataTable data={items}>
     <Columns>
-      {/* Override specific cell */}
-      <Column header="Actions" el={<td className="action-cell" />}>
+      {/* Most cells use Material-UI from context */}
+      <Column header="Name" accessor="name" />
+      <Column header="Price" accessor="price" />
+
+      {/* This one gets special styling */}
+      <Column
+        header="Actions"
+        el={<td className="action-cell" style={{ padding: '16px' }} />}
+      >
         <button>Edit</button>
       </Column>
     </Columns>
@@ -792,6 +1003,8 @@ const muiElements = {
   </DataTable>
 </TableElementsProvider>
 ```
+
+This mixed approach gives you the best of both worlds: global consistency with targeted customization where needed.
 
 ### Element Flow Summary
 
