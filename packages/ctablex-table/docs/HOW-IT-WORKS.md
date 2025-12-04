@@ -4,7 +4,7 @@ Deep dive into the internal architecture of **@ctablex/table**.
 
 ## Table of Contents
 
-- [Core Architecture](#core-architecture)
+- [Key Concepts](#key-concepts)
 - [Three-Context System](#three-context-system)
 - [Rendering Phases](#rendering-phases)
 - [Part-Based Rendering](#part-based-rendering)
@@ -15,55 +15,238 @@ Deep dive into the internal architecture of **@ctablex/table**.
 
 ---
 
-## Core Architecture
+## Key Concepts
 
-**@ctablex/table** is built on top of **@ctablex/core**'s micro-context pattern. The architecture consists of:
+To understand **@ctablex/table**, you should know these fundamental concepts:
 
-1. **Data Context** - Flows table data through `ContentProvider`
-2. **Part Context** - Tracks rendering phase (definition, header, body, footer)
-3. **Columns Context** - Stores column definitions
-4. **Elements Context** - Provides customizable HTML elements
+### 1. Column Extraction and Provision by DataTable
 
-### Component Layers
+**DataTable** is responsible for finding and storing column definitions:
 
+```tsx
+export function DataTable<D>(props: DataTableProps<D>) {
+  const { children } = props;
+  
+  // Extract columns from children
+  const columns = useMemo(() => findColumns(children), [children]);
+
+  return (
+    <ColumnsProvider value={columns}>
+      {children}
+    </ColumnsProvider>
+  );
+}
 ```
-┌─────────────────────────────────────┐
-│ DataTable                           │  Entry point, sets up contexts
-│ ├─ ContentProvider (data)           │
-│ ├─ PartProvider (DEFINITION_PART)   │
-│ └─ ColumnsProvider (extracted cols) │
-└─────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│ Table                               │  Structural components
-│ ├─ TableHeader                      │
-│ │  └─ PartProvider (HEADER_PART)    │
-│ ├─ TableBody                        │
-│ │  └─ PartProvider (BODY_PART)      │
-│ └─ TableFooter                      │
-│    └─ PartProvider (FOOTER_PART)    │
-└─────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│ Rows / Row                          │  Row iteration
-│ └─ ArrayContent (from core)         │
-│    └─ ContentProvider (row data)    │
-└─────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│ Columns / Column                    │  Column rendering
-│ └─ Cell / HeaderCell                │
-│    └─ ContentProvider (field value) │
-└─────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│ Content Components                  │  Value rendering
-│ (DefaultContent, Custom, etc.)      │
-└─────────────────────────────────────┘
+
+**How it works:**
+
+1. `DataTable` searches its children for `Columns` components
+2. Uses `findColumns()` utility to extract column definitions
+3. Stores them in `ColumnsContext` via `ColumnsProvider`
+4. Any `Columns` component in the tree can retrieve these definitions
+
+**Example:**
+
+```tsx
+<DataTable data={items}>
+  {/* Columns defined here */}
+  <Columns>
+    <Column header="Name" accessor="name" />
+    <Column header="Price" accessor="price" />
+  </Columns>
+
+  <Table>
+    <TableBody>
+      <Rows>
+        <Row>
+          {/* Columns rendered here using extracted definitions */}
+          <Columns />
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+The first `<Columns>` declares the definitions, the second `<Columns>` renders them.
+
+### 2. Column Behavior: Definition vs Rendering Parts
+
+Columns behave differently depending on which "part" of the table is being rendered:
+
+**In DEFINITION_PART** (column extraction phase):
+- `Columns` component returns `null` and doesn't render
+- This allows `DataTable` to extract column definitions without rendering them
+
+**In other parts** (HEADER_PART, BODY_PART, FOOTER_PART):
+- `Columns` component retrieves stored definitions and renders them
+- Individual `Column` components render differently based on the current part
+
+```tsx
+export function Columns(props: ColumnsProps) {
+  const currentPart = usePart();
+
+  // Don't render during definition extraction
+  if (currentPart === DEFINITION_PART) {
+    return null;
+  }
+
+  // Render in other parts
+  const columns = useColumns();
+  return <>{columns}</>;
+}
+```
+
+```tsx
+export function Column<D>(props: ColumnProps<D>) {
+  const part = usePart();
+
+  // In header: render header cell
+  if (part === HEADER_PART) {
+    return <HeaderCell>{props.header}</HeaderCell>;
+  }
+
+  // In body/footer: render data cell
+  return <Cell accessor={props.accessor}>{children}</Cell>;
+}
+```
+
+### 3. Table Component Expansion to Default Children
+
+The `Table` component automatically expands to include `TableHeader` and `TableBody` if you don't provide children:
+
+```tsx
+const defaultChildren = (
+  <>
+    <TableHeader />
+    <TableBody />
+  </>
+);
+
+export function Table(props: TableProps) {
+  const { children = defaultChildren } = props;
+  // ...
+  return <table>{children}</table>;
+}
+```
+
+**This means:**
+
+```tsx
+// Minimal usage
+<Table />
+
+// Expands to:
+<Table>
+  <TableHeader />
+  <TableBody />
+</Table>
+```
+
+Similarly, `TableHeader`, `TableBody`, and other components have their own default children:
+
+```tsx
+// TableHeader defaults
+<TableHeader>
+  <HeaderRow>
+    <Columns />
+  </HeaderRow>
+</TableHeader>
+
+// TableBody defaults
+<TableBody>
+  <Rows>
+    <Row>
+      <Columns />
+    </Row>
+  </Rows>
+</TableBody>
+```
+
+This allows for **minimal boilerplate** while maintaining **full customizability**.
+
+### 4. Element Rendering
+
+Elements can be provided from context, props, or a combination of both.
+
+#### Elements from Context
+
+All table components use `TableElementsContext` to get their HTML elements:
+
+```tsx
+export function Row(props: RowProps) {
+  const elements = useTableElements();
+  const el = props.el ?? elements.tr; // Use prop or context element
+  // ...
+}
+```
+
+**Default elements:**
+
+```tsx
+export const defaultTableElements: TableElements = {
+  table: 'table',
+  thead: 'thead',
+  tbody: 'tbody',
+  tfoot: 'tfoot',
+  tr: 'tr',
+  th: 'th',
+  td: 'td',
+};
+```
+
+#### Elements from Props
+
+You can override elements via props:
+
+```tsx
+<Row el="div">  {/* Use <div> instead of <tr> */}
+  <Cell el="span">...</Cell>  {/* Use <span> instead of <td> */}
+</Row>
+```
+
+#### How Props are Merged
+
+Components use the `addProps` utility from `@ctablex/core` to merge props:
+
+```tsx
+export function Cell(props: CellProps) {
+  const elements = useTableElements();
+  const el = props.el ?? elements.td;
+  
+  const { accessor, el: _, ...rest } = props;
+  
+  // Merge props with element
+  return addProps(el, {
+    ...rest,
+    children: <ContentProvider value={value}>{children}</ContentProvider>
+  });
+}
+```
+
+**Key points:**
+
+1. **Element priority**: `props.el` > `elements.td` (prop overrides context)
+2. **Prop spreading**: Component props are spread onto the element
+3. **Reserved props**: Internal props like `accessor` are filtered out
+4. **Children wrapping**: Content is wrapped in providers before being passed as children
+
+**Example of prop merging:**
+
+```tsx
+<Cell 
+  accessor="name" 
+  el="div" 
+  className="custom-cell" 
+  style={{ color: 'red' }}
+/>
+
+// Results in:
+<div className="custom-cell" style={{ color: 'red' }}>
+  <ContentProvider value={nameValue}>
+    <DefaultContent />
+  </ContentProvider>
+</div>
 ```
 
 ---
