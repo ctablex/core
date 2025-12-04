@@ -391,6 +391,57 @@ The part identifier for this column set. Columns without a part are the default.
 </DataTable>
 ```
 
+**⚠️ Important:** `Columns` must be an **immediate child** of `DataTable` for column extraction to work.
+
+**Not allowed:**
+
+```tsx
+<DataTable data={items}>
+  <>
+    <Columns /> {/* ✗ Not ok - Columns wrapped in fragment */}
+  </>
+</DataTable>
+
+<DataTable data={items}>
+  <MyColumns /> {/* ✗ Not ok - Columns wrapped in custom component */}
+</DataTable>
+```
+
+**Workaround for wrapping `Columns`:**
+
+If you need to wrap `Columns` itself in a custom component, mark it with `__COLUMNS__`:
+
+```tsx
+function MyColumns() {
+  return (
+    <Columns>
+      <Column header="Name" accessor="name" />
+      <Column header="Price" accessor="price" />
+    </Columns>
+  );
+}
+
+MyColumns.__COLUMNS__ = true; // Mark as column container
+
+<DataTable data={items}>
+  <MyColumns /> {/* ✓ Now works */}
+</DataTable>;
+```
+
+**Note:** Custom components _inside_ `Columns` (wrapping `Column` components) work fine without any special marking:
+
+```tsx
+function MyColumn() {
+  return <Column header="Name" accessor="name" />;
+}
+
+<DataTable data={items}>
+  <Columns>
+    <MyColumn /> {/* ✓ OK - custom component inside Columns */}
+  </Columns>
+</DataTable>;
+```
+
 ### What It Does
 
 When rendering in `DEFINITION_PART`:
