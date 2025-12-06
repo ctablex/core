@@ -185,6 +185,8 @@ declare type IsTuple<T> = T extends readonly any[] & {
 
 export declare function KeyContent(): JSX_2.Element;
 
+export declare const KeyContext: Context<string | number | symbol | undefined>;
+
 export declare function NullableContent(
   props: NullableContentProps,
 ): JSX_2.Element;
@@ -257,5 +259,7 @@ declare type PathPrefix<
 export declare function useContent<V>(value?: V): V;
 
 export declare function useIndex(): number;
+
+export declare function useKey(): string | number | symbol;
 
 export {};
