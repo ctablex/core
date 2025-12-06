@@ -199,6 +199,10 @@ MyColumns.__COLUMNS__ = true; // Mark as column container
 
 The extracted columns are provided to the component tree via `ColumnsContext`:
 
+<!-- columns context is internal. it is good user know that there is columns context which is provided by data table and consumed by <Columns/> component 
+useColumns is not public API. so it is better no mention of it
+-->
+
 Any component in the tree can access the extracted column definitions by calling `useColumns()`.
 
 ## Column Behavior: Definition vs Rendering
@@ -781,18 +785,6 @@ export function Cell<D>(props: CellProps<D>) {
 Table elements are provided via context:
 
 ```tsx
-// In src/elements/table-elements-context.tsx
-export const TableElementsContext = createContext<TableElements | undefined>(
-  undefined,
-);
-
-```
-
-### Default Elements
-
-By default, standard HTML elements are used:
-
-```tsx
 // In src/elements/table-elements.tsx
 export interface TableElements {
   table: ReactElement;
@@ -804,6 +796,16 @@ export interface TableElements {
   td: ReactElement;
 }
 
+// In src/elements/table-elements-context.tsx
+export const TableElementsContext = createContext<TableElements | undefined>(
+  undefined,
+);
+
+```
+
+By default, standard HTML elements are used:
+
+```tsx
 export const defaultTableElements: TableElements = {
   table: <table />,
   thead: <thead />,
