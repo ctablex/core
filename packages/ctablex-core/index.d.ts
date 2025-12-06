@@ -112,6 +112,15 @@ export declare interface ContentProviderProps<V> {
 
 export declare function DefaultContent(): JSX_2.Element;
 
+export declare function EmptyContent<C>(
+  props: EmptyContentProps<C>,
+): JSX_2.Element | null;
+
+export declare interface EmptyContentProps<C> {
+  children?: ReactNode;
+  isEmpty?: (content: C) => boolean;
+}
+
 export declare function FieldContent<V>(
   props: FieldContentProps<V>,
 ): JSX_2.Element;
@@ -187,6 +196,15 @@ export declare function KeyContent(): JSX_2.Element;
 
 export declare const KeyContext: Context<string | number | symbol | undefined>;
 
+export declare function NonEmptyContent<C>(
+  props: NonEmptyContentProps<C>,
+): JSX_2.Element | null;
+
+export declare interface NonEmptyContentProps<C> {
+  children?: ReactNode;
+  isEmpty?: (content: C) => boolean;
+}
+
 export declare function NullableContent(
   props: NullableContentProps,
 ): JSX_2.Element;
@@ -194,6 +212,14 @@ export declare function NullableContent(
 export declare interface NullableContentProps {
   children?: ReactNode;
   nullContent?: ReactNode;
+}
+
+export declare function NullContent(
+  props: NullContentProps,
+): JSX_2.Element | null;
+
+export declare interface NullContentProps {
+  children?: ReactNode;
 }
 
 export declare function ObjectContent<V extends object>(
