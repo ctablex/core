@@ -9,6 +9,9 @@ import { IndexContent } from './index-content';
 import { KeyContent } from './key-content';
 import { NullableContent } from './nullable-content';
 import { ObjectContent } from './object-content';
+import { NullContent } from './null-content';
+import { EmptyContent } from './empty-content';
+import { NonEmptyContent } from './non-empty-content';
 
 describe('content', () => {
   it('should render empty array', () => {
@@ -242,17 +245,382 @@ describe('content', () => {
     expect(screen.getByTestId('root')).toHaveTextContent('a: a, b|c: c, d');
   });
 
-  it('should render nullable content', () => {
-    render(
-      <div data-testid="root">
-        <ContentProvider value={null}>
-          <NullableContent>
-            <ArrayContent />
-          </NullableContent>
-        </ContentProvider>
-      </div>,
-    );
-    expect(screen.getByTestId('root')).toHaveTextContent('');
+  describe('nullable content', () => {
+    it('should render nullable content with default nullContent', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <NullableContent>
+              <ArrayContent />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('');
+    });
+
+    it('should render nullable content with undefined content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={undefined}>
+            <NullableContent>
+              <ArrayContent />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('');
+    });
+
+    it('should render nullable content with custom nullContent', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <NullableContent nullContent="No Data">
+              <ArrayContent />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render nullable content with non-null content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={['x', 'y']}>
+            <NullableContent nullContent="No Data">
+              <ArrayContent join=" " />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('x y');
+    });
+  });
+
+  describe('null content', () => {
+    it('should render null content with null content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <NullContent>No Data</NullContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render null content with undefined content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={undefined}>
+            <NullContent>No Data</NullContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render null content with non-null content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={5}>
+            <NullContent>No Data</NullContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('');
+    });
+  });
+
+  describe('non empty content', () => {
+    it('should not render non-empty content with null content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <EmptyContent>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent>
+              <ul>
+                <ArrayContent>
+                  <li>
+                    <DefaultContent />
+                  </li>
+                </ArrayContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<div>No Data</div>"`,
+      );
+    });
+
+    it('should not render non-empty content with undefined content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={undefined}>
+            <EmptyContent>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent>
+              <ul>
+                <ArrayContent>
+                  <li>
+                    <DefaultContent />
+                  </li>
+                </ArrayContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<div>No Data</div>"`,
+      );
+    });
+
+    it('should not render non-empty content with empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[]}>
+            <EmptyContent>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent>
+              <ul>
+                <ArrayContent>
+                  <li>
+                    <DefaultContent />
+                  </li>
+                </ArrayContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<div>No Data</div>"`,
+      );
+    });
+
+    it('should render non-empty content with non-empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[1, 2, 3]}>
+            <EmptyContent>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent>
+              <ul>
+                <ArrayContent>
+                  <li>
+                    <DefaultContent />
+                  </li>
+                </ArrayContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<ul><li>1</li><li>2</li><li>3</li></ul>"`,
+      );
+    });
+
+    it('should render non-empty content with custom isEmpty', () => {
+      const isEmpty = (content: object) => {
+        return Object.keys(content).length === 0;
+      };
+      render(
+        <div data-testid="root">
+          <ContentProvider value={{ name: 'test', age: 30 }}>
+            <EmptyContent<object> isEmpty={isEmpty}>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent<object> isEmpty={isEmpty}>
+              <ul>
+                <ObjectContent>
+                  <li>
+                    <KeyContent />: <DefaultContent />
+                  </li>
+                </ObjectContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.queryByText('No Data')).not.toBeInTheDocument();
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<ul><li>name: test</li><li>age: 30</li></ul>"`,
+      );
+    });
+
+    it('should render non-empty content with custom isEmpty and empty content', () => {
+      const isEmpty = (content: object) => {
+        return Object.keys(content).length === 0;
+      };
+      render(
+        <div data-testid="root">
+          <ContentProvider value={{}}>
+            <EmptyContent<object> isEmpty={isEmpty}>
+              <div>No Data</div>
+            </EmptyContent>
+            <NonEmptyContent<object> isEmpty={isEmpty}>
+              <ul>
+                <ObjectContent>
+                  <li>
+                    <KeyContent />: <DefaultContent />
+                  </li>
+                </ObjectContent>
+              </ul>
+            </NonEmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByText('No Data')).toBeInTheDocument();
+      expect(screen.getByTestId('root').innerHTML).toMatchInlineSnapshot(
+        `"<div>No Data</div>"`,
+      );
+    });
+  });
+
+  describe('empty content', () => {
+    it('should render empty content with null content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <EmptyContent>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render empty content with undefined content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={undefined}>
+            <EmptyContent>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render empty content with empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[]}>
+            <EmptyContent>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should not render empty content with non-empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[1, 2, 3]}>
+            <EmptyContent>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('');
+    });
+
+    it('should not render empty content with non-array content', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={5}>
+            <EmptyContent>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('');
+    });
+
+    it('should render empty content with custom isEmpty', () => {
+      const isEmpty = (content: object) => {
+        return Object.keys(content).length === 0;
+      };
+      render(
+        <div data-testid="root">
+          <ContentProvider value={{}}>
+            <EmptyContent<object> isEmpty={isEmpty}>No Data</EmptyContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+  });
+
+  describe('mixed null and empty', () => {
+    it('should render mixed empty and nullable content with null', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={null}>
+            <NullableContent nullContent="No Data">
+              <EmptyContent>Empty</EmptyContent>
+              <ArrayContent join=", " />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render mixed empty and nullable content with undefined', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={undefined}>
+            <NullableContent nullContent="No Data">
+              <EmptyContent>Empty</EmptyContent>
+              <ArrayContent join=", " />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('No Data');
+    });
+
+    it('should render mixed empty and nullable content with empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[]}>
+            <NullableContent nullContent="No Data">
+              <EmptyContent>Empty</EmptyContent>
+              <ArrayContent join=", " />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('Empty');
+    });
+
+    it('should render mixed empty and nullable content with non-empty array', () => {
+      render(
+        <div data-testid="root">
+          <ContentProvider value={[1, 2, 3]}>
+            <NullableContent nullContent="No Data">
+              <EmptyContent>Empty</EmptyContent>
+              <ArrayContent join=", " />
+            </NullableContent>
+          </ContentProvider>
+        </div>,
+      );
+      expect(screen.getByTestId('root')).toHaveTextContent('1, 2, 3');
+    });
   });
 
   it('should accept value prop', () => {
