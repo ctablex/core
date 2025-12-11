@@ -18,7 +18,7 @@ export declare interface ColumnProps<D = any> {
   thEl?: ReactElement;
 }
 
-export declare function Columns(props: ColumnsProps): JSX_2.Element | null;
+export declare function Columns(props: ColumnsProps): JSX_2.Element;
 
 export declare namespace Columns {
   var __COLUMNS__: boolean;
@@ -73,7 +73,9 @@ export declare function Table(
   props: TableProps,
 ): ReactElement<any, string | JSXElementConstructor<any>>;
 
-export declare function TableBody(props: TableBodyProps): JSX_2.Element;
+export declare function TableBody(
+  props: TableBodyProps,
+): ReactElement<any, string | JSXElementConstructor<any>>;
 
 export declare interface TableBodyProps {
   el?: ReactElement;
@@ -99,7 +101,9 @@ declare interface TableElementsProviderProps {
   children?: ReactNode;
 }
 
-export declare function TableFooter(props: TableFooterProps): JSX_2.Element;
+export declare function TableFooter(
+  props: TableFooterProps,
+): ReactElement<any, string | JSXElementConstructor<any>>;
 
 export declare interface TableFooterProps {
   el?: ReactElement;

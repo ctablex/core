@@ -1,6 +1,4 @@
 import { ReactNode, useMemo } from 'react';
-import { DEFINITION_PART } from '../data-table';
-import { usePart } from './part-context';
 import { useColumns } from './columns-context';
 import { findColumnsByPart } from './utils';
 
@@ -10,17 +8,16 @@ export interface ColumnsProps {
 }
 
 export function Columns(props: ColumnsProps) {
-  const currentPart = usePart();
   const columns = useColumns();
+  if (columns === undefined) {
+    throw new Error('Columns must be used within a DataTable');
+  }
   const { part } = props;
 
   const partColumns = useMemo(
     () => findColumnsByPart(columns, part),
     [columns, part],
   );
-  if (currentPart === DEFINITION_PART) {
-    return null;
-  }
   return <>{partColumns}</>;
 }
 
