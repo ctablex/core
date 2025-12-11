@@ -405,10 +405,79 @@ describe('ctablex', () => {
     );
     expect(screen.getByText('other')).toBeInTheDocument();
   });
-  it('should throw error if render outside of data-table', () => {
-    // @ts-ignore
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<Columns />)).toThrow();
+  describe('Columns', () => {
+    it('should throw error when rendered outside of DataTable', () => {
+      // @ts-ignore
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() => render(<Columns />)).toThrow();
+    });
+    it('should not render Columns definition directly in DataTable', () => {
+      const { container } = render(
+        <DataTable data={data}>
+          <Columns>columns content</Columns>
+          other content
+        </DataTable>,
+      );
+      expect(container.innerHTML).toBe('other content');
+    });
+    it('should render defined Columns when referenced in child elements', () => {
+      const { container } = render(
+        <DataTable data={data}>
+          <Columns>columns content</Columns>
+          <div>
+            <Columns>ignored</Columns>
+          </div>
+        </DataTable>,
+      );
+      expect(container.innerHTML).toBe('<div>columns content</div>');
+    });
+    it('should render all defined Columns when referenced together', () => {
+      const { container } = render(
+        <DataTable data={data}>
+          <Columns>columns content 1</Columns>
+          <Columns>columns content 2</Columns>
+          <div>
+            <Columns />
+          </div>
+        </DataTable>,
+      );
+      expect(container.innerHTML).toBe(
+        '<div>columns content 1columns content 2</div>',
+      );
+    });
+    it('should render columns based on part', () => {
+      const { container } = render(
+        <DataTable data={data}>
+          <Columns>columns content</Columns>
+          <Columns part="detail">detail content</Columns>
+          <div>
+            <Columns />
+            <span>
+              <Columns part="detail" />
+            </span>
+          </div>
+        </DataTable>,
+      );
+      expect(container.innerHTML).toBe(
+        '<div>columns content<span>detail content</span></div>',
+      );
+    });
+    it('should render nothing for non-existing part references', () => {
+      const { container } = render(
+        <DataTable data={data}>
+          <Columns>columns content</Columns>
+          <div>
+            <Columns />
+            <span>
+              <Columns part="not-existing" />
+            </span>
+          </div>
+        </DataTable>,
+      );
+      expect(container.innerHTML).toBe(
+        '<div>columns content<span></span></div>',
+      );
+    });
   });
   it('should accept type', () => {
     render(

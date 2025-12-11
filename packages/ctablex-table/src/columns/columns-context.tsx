@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext } from 'react';
 
-export const ColumnsContext = createContext<ReactNode>(null);
+export const ColumnsContext = createContext<ReactNode>(undefined);
 
 export function useColumns() {
   return useContext(ColumnsContext);

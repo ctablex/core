@@ -1,6 +1,15 @@
 import { Children, isValidElement, ReactNode } from 'react';
 import { isColumnsType } from './types';
 
+export function findNonColumnsChildren(children: ReactNode): ReactNode {
+  return Children.map(children, (child): ReactNode => {
+    if (isValidElement(child) && isColumnsType(child.type)) {
+      return null;
+    }
+    return child;
+  });
+}
+
 export function findColumns(children: ReactNode): ReactNode {
   return Children.map(children, (child): ReactNode => {
     if (isValidElement(child) && isColumnsType(child.type)) {
