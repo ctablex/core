@@ -204,12 +204,23 @@ export { ContentValueProps };
  */
 export declare function DefaultContent(): JSX_2.Element;
 
+/**
+ * Renders its children only when the content is null, undefined, or empty.
+ * @remarks
+ * Uses {@link useContent} to access the current content from the context.
+ * By default, uses {@link defaultIsEmpty} to check for empty arrays.
+ */
 export declare function EmptyContent<C>(
   props: EmptyContentProps<C>,
 ): JSX_2.Element | null;
 
+/**
+ * Props for the {@link EmptyContent} component.
+ */
 export declare interface EmptyContentProps<C> {
+  /** Content to render when the content is empty. */
   children?: ReactNode;
+  /** Custom function to determine if content is empty. Defaults to {@link defaultIsEmpty}. */
   isEmpty?: (content: C) => boolean;
 }
 
@@ -315,12 +326,23 @@ export declare function KeyContent(): JSX_2.Element;
  */
 export declare const KeyContext: Context<string | number | symbol | undefined>;
 
+/**
+ * Renders its children only when the content is not null, not undefined, and not empty.
+ * @remarks
+ * Uses {@link useContent} to access the current content from the context.
+ * By default, uses {@link defaultIsEmpty} to check for empty arrays.
+ */
 export declare function NonEmptyContent<C>(
   props: NonEmptyContentProps<C>,
 ): JSX_2.Element | null;
 
+/**
+ * Props for the {@link NonEmptyContent} component.
+ */
 export declare interface NonEmptyContentProps<C> {
+  /** Content to render when the content is not empty. */
   children?: ReactNode;
+  /** Custom function to determine if content is empty. Defaults to {@link defaultIsEmpty}. */
   isEmpty?: (content: C) => boolean;
 }
 
@@ -339,11 +361,20 @@ export declare interface NullableContentProps {
   nullContent?: ReactNode;
 }
 
+/**
+ * Renders its children only when the content is null or undefined.
+ * @remarks
+ * Uses {@link useContent} to access the current content from the context.
+ */
 export declare function NullContent(
   props: NullContentProps,
 ): JSX_2.Element | null;
 
+/**
+ * Props for the {@link NullContent} component.
+ */
 export declare interface NullContentProps {
+  /** Content to render when the content is null or undefined. */
   children?: ReactNode;
 }
 

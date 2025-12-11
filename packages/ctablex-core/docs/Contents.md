@@ -307,6 +307,93 @@ const user2: User = { name: 'Bob', email: undefined };
 - Display fallback text for missing optional fields
 - Hide content when data is unavailable
 
+## NullContent
+
+Conditionally renders children only when the content value is `null` or `undefined`.
+
+`NullContent` is useful for rendering complex fallback content when the value is missing. It is the opposite of `NullableContent`, which renders content when the value exists. For simpler cases, you can use the `nullContent` prop of `NullableContent`.
+
+### Props
+
+```tsx
+interface NullContentProps {
+  children?: ReactNode;
+}
+```
+
+- **`children`** - Content to render when value is null or undefined
+
+### Behavior
+
+- Retrieves the content value from context
+- Renders children if value is `null` or `undefined`
+- Returns `null` otherwise (renders nothing)
+
+### Example
+
+```tsx
+import { NullContent, ContentProvider } from '@ctablex/core';
+
+// Renders children when null
+<ContentProvider value={null}>
+  <NullContent>
+    <div>No data available</div>
+  </NullContent>
+</ContentProvider>
+// Renders: <div>No data available</div>
+
+// Renders children when undefined
+<ContentProvider value={undefined}>
+  <NullContent>
+    <div>No data available</div>
+  </NullContent>
+</ContentProvider>
+// Renders: <div>No data available</div>
+
+// Renders nothing when value exists
+<ContentProvider value="Hello">
+  <NullContent>
+    <div>No data available</div>
+  </NullContent>
+</ContentProvider>
+// Renders: (nothing)
+
+// Renders nothing for empty string
+<ContentProvider value="">
+  <NullContent>
+    <div>No data available</div>
+  </NullContent>
+</ContentProvider>
+// Renders: (nothing) - empty string is not null/undefined
+```
+
+### Use Cases
+
+- Display fallback UI when data is missing
+- Render complex content when value is null (for simpler cases, use the `nullContent` prop of `NullableContent`)
+
+```tsx
+type User = {
+  name: string;
+  email?: string;
+};
+
+const user: User = { name: 'Alice' };
+
+<ContentProvider value={user}>
+  <FieldContent field="email">
+    <NullContent>
+      <span>Email not provided</span>
+    </NullContent>
+    <NullableContent>
+      <DefaultContent />
+    </NullableContent>
+  </FieldContent>
+</ContentProvider>;
+
+// Renders: <span>Email not provided</span>
+```
+
 ## DefaultContent
 
 Renders primitive values (string, number, null, undefined) directly.
