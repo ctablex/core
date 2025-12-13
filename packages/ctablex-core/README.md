@@ -13,6 +13,8 @@ This enables:
 - **No prop drilling** through intermediate components
 - **Immutable children** for better performance optimization
 
+Read more: [Micro-Context Pattern](./docs/MICRO-CONTEXT.md)
+
 ## Installation
 
 ```bash
@@ -65,24 +67,27 @@ function MyComponent() {
 }
 ```
 
+Read more: [ContentContext - ContentProvider & useContent](./docs/ContentContext.md)
+
 ### Content Components
 
 Transform and access data through context:
 
 ```tsx
 import {
-  AccessorContent,
+  ContentValue,
   FieldContent,
   ArrayContent,
   ObjectContent,
   NullableContent,
   DefaultContent,
+  KeyContent,
 } from '@ctablex/core';
 
 // Access nested paths
-<AccessorContent accessor="user.address.city">
+<ContentValue accessor="user.address.city">
   <DefaultContent />
-</AccessorContent>
+</ContentValue>
 
 // Access object fields
 <FieldContent field="price">
@@ -113,12 +118,14 @@ import {
 </FieldContent>
 ```
 
+Read more: [Contents](./docs/Contents.md), [ArrayContent](./docs/ArrayContent.md), [ObjectContent](./docs/ObjectContent.md)
+
 ### Type-Safe Accessors
 
 Extract values with strong TypeScript support:
 
 ```tsx
-import { accessByPath, access } from '@ctablex/core';
+import { access } from '@ctablex/core';
 
 type User = {
   profile: {
@@ -129,11 +136,13 @@ type User = {
 const user: User = { profile: { name: 'Bob' } };
 
 // Path accessor with autocomplete
-const name = accessByPath(user, 'profile.name'); // ✓ Type-safe
+const name = access(user, 'profile.name'); // ✓ Type-safe + autocomplete
 
 // Function accessor
-const value = access(user, (u) => u.profile.name); // ✓ Type inference
+const value = access(user, (u) => u.profile.name); // ✓ Type inference + auto type safety
 ```
+
+Read more: [Accessors](./docs/Accessors.md)
 
 ## Key Features
 
@@ -153,7 +162,7 @@ function PriceDisplay() {
 </ContentProvider>;
 ```
 
-### Default Children
+### Default Children and Open for Customization
 
 Components provide sensible defaults while remaining customizable:
 
@@ -185,28 +194,9 @@ function ProductList() {
 }
 ```
 
-## Type Safety
+## Type Safety Limitations
 
-⚠️ **Important:** Generic types must be explicitly provided for type checking and autocomplete:
-
-```tsx
-// ✓ Type-safe with explicit generic
-<FieldContent<User> field="name">
-  <DefaultContent />
-</FieldContent>
-
-// ✗ No type checking without generic
-<FieldContent field="name">
-  <DefaultContent />
-</FieldContent>
-
-// ✓ Accessor props are validated based on generic
-<AccessorContent<User> accessor="profile.name">
-  <DefaultContent />
-</AccessorContent>
-```
-
-**Note:** Nested components do NOT inherit types automatically - each needs its own explicit generic for type safety.
+⚠️ Micro-context provides weak type safety. Generic types must be manually specified and cannot be validated across context boundaries. See [MICRO-CONTEXT.md - Weak Type Safety](./docs/MICRO-CONTEXT.md#weak-type-safety) for details.
 
 ## Documentation
 
@@ -215,7 +205,7 @@ For detailed documentation, common patterns, and pitfalls, see:
 - **[Documentation Guide](./docs/README.md)** - Start here for a complete overview
 - **[Micro-Context Pattern](./docs/MICRO-CONTEXT.md)** - Understand the core concept
 - **[ContentContext](./docs/ContentContext.md)** - ContentProvider, useContent, ContentContext
-- **[Contents](./docs/Contents.md)** - AccessorContent, FieldContent, NullableContent, DefaultContent
+- **[Contents](./docs/Contents.md)** - ContentValue, FieldContent, NullableContent, DefaultContent
 - **[ArrayContent](./docs/ArrayContent.md)** - Array iteration components
 - **[ObjectContent](./docs/ObjectContent.md)** - Object iteration components
 - **[Accessors](./docs/Accessors.md)** - Type-safe value extraction

@@ -2,6 +2,14 @@
 
 Components for iterating over arrays and accessing array indices.
 
+## TL;DR
+
+- Use `<ArrayContent>` to iterate over arrays
+- Use `<IndexContent>` to display the current array index
+- Use `IndexContext`, `useIndex` to access the current index
+- Use `<EmptyContent>` to render content when the array is empty
+- Use `<NonEmptyContent>` to render content when the array is not empty
+
 ## ArrayContent
 
 Iterates over an array, rendering children for each element. Provides both the array element and its index via context.
@@ -29,8 +37,8 @@ type ArrayGetKey<V> = (value: V, index: number) => string | number;
 ### Behavior
 
 - Iterates over the array from the content context
-- Wraps each element in a `ContentProvider` with the element value
 - Provides the array index via `IndexContext`
+- Provides each element via `ContentProvider`
 - Renders `join` content between elements (not before the first element)
 - Uses `getKey` to generate React keys for list items
 
@@ -394,7 +402,7 @@ import { NonEmptyContent, ContentProvider } from '@ctablex/core';
 ### Use Cases
 
 - Display content only when data is available
-- Wrap arrays with DOM elements only when not empty (iterating over an empty array returns an empty array, so use `NonEmptyContent` when you need a wrapper)
+- Wrap arrays with DOM elements only when not empty
 - Apply custom `isEmpty` logic for different data types
 
 #### Wrapping Arrays with DOM Elements
@@ -442,6 +450,7 @@ Use both components together to handle all cases:
     <div>No results found</div>
   </EmptyContent>
   <NonEmptyContent>
+    <h2>Results:</h2>
     <ArrayContent>
       <div>
         <DefaultContent />

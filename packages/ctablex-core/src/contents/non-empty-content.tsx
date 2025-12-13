@@ -8,7 +8,7 @@ import { defaultIsEmpty } from './empty-content';
 export interface NonEmptyContentProps<C> {
   /** Content to render when the content is not empty. */
   children?: ReactNode;
-  /** Custom function to determine if content is empty. Defaults to {@link defaultIsEmpty}. */
+  /** Custom function to determine if content is empty. By default, only arrays with length 0 are considered empty. */
   isEmpty?: (content: C) => boolean;
 }
 
@@ -16,7 +16,7 @@ export interface NonEmptyContentProps<C> {
  * Renders its children only when the content is not null, not undefined, and not empty.
  * @remarks
  * Uses {@link useContent} to access the current content from the context.
- * By default, uses {@link defaultIsEmpty} to check for empty arrays.
+ * By default, only arrays with length 0 are considered empty.
  */
 export function NonEmptyContent<C>(props: NonEmptyContentProps<C>) {
   const { children, isEmpty = defaultIsEmpty } = props;

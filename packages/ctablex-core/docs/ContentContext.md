@@ -6,6 +6,10 @@ The Content Context system provides the foundation for the micro-context pattern
 - **`ContentProvider`** - Component to provide values via context
 - **`useContent`** - Hook to consume values from context
 
+## TL;DR
+
+Use `<ContentProvider value={...}>` to provide any value and make it available to descendant components. Use `useContent` within those components to access the provided value. `useContent` can also accept an optional override value.
+
 ## Basic Usage
 
 ```tsx
@@ -253,44 +257,29 @@ Legacy consumer pattern instead of hooks:
 </ContentContext.Consumer>
 ```
 
-### Why Value is Wrapped in Object
-
-The context type is `{ value: V }` instead of just `V`:
-
-```tsx
-// Actual structure
-type ContentContextType<V> = { value: V };
-
-// NOT this
-type ContentContextType<V> = V;
-```
-
-**Reason:** React Context uses reference equality to detect changes. Wrapping in an object ensures distinct contexts are properly detected, especially with primitives or multiple nested providers.
-
 ## Type Safety Limitations
 
-### No Type Inference
+### No Type Inference or Validation
 
-The hook cannot infer the type from context. You must manually specify it:
+The hook cannot infer the type from context, and TypeScript cannot verify that the type parameter matches the actual context value:
 
 ```tsx
 type User = { name: string };
 
-<ContentProvider value={{ name: 'Alice' }}>
-  {/* Must manually specify type */}
+function Component() {
+  // Must manually specify type - no inference
   const user = useContent<User>();
+  return <div>{user.name}</div>;
+}
+
+// ✓ Correct usage
+<ContentProvider value={{ name: 'Alice' }}>
+  <Component />
 </ContentProvider>
-```
 
-### No Validation
-
-TypeScript cannot verify that the type parameter on `useContent` matches the actual context value:
-
-```tsx
+// ✗ Type mismatch, but compiles! Runtime error!
 <ContentProvider value={123}>
-  {/* Wrong type in useContent, but no compile error! */}
-  const user = useContent<User>();  // ✗ Type mismatch, but compiles
-  return <div>{user.name}</div>;    // ✗ Runtime error!
+  <Component />
 </ContentProvider>
 ```
 

@@ -208,7 +208,7 @@ export declare function DefaultContent(): JSX_2.Element;
  * Renders its children only when the content is null, undefined, or empty.
  * @remarks
  * Uses {@link useContent} to access the current content from the context.
- * By default, uses {@link defaultIsEmpty} to check for empty arrays.
+ * By default, only arrays with length 0 are considered empty.
  */
 export declare function EmptyContent<C>(
   props: EmptyContentProps<C>,
@@ -220,7 +220,7 @@ export declare function EmptyContent<C>(
 export declare interface EmptyContentProps<C> {
   /** Content to render when the content is empty. */
   children?: ReactNode;
-  /** Custom function to determine if content is empty. Defaults to {@link defaultIsEmpty}. */
+  /** Custom function to determine if content is empty. By default, only arrays with length 0 are considered empty. */
   isEmpty?: (content: C) => boolean;
 }
 
@@ -330,7 +330,7 @@ export declare const KeyContext: Context<string | number | symbol | undefined>;
  * Renders its children only when the content is not null, not undefined, and not empty.
  * @remarks
  * Uses {@link useContent} to access the current content from the context.
- * By default, uses {@link defaultIsEmpty} to check for empty arrays.
+ * By default, only arrays with length 0 are considered empty.
  */
 export declare function NonEmptyContent<C>(
   props: NonEmptyContentProps<C>,
@@ -342,7 +342,7 @@ export declare function NonEmptyContent<C>(
 export declare interface NonEmptyContentProps<C> {
   /** Content to render when the content is not empty. */
   children?: ReactNode;
-  /** Custom function to determine if content is empty. Defaults to {@link defaultIsEmpty}. */
+  /** Custom function to determine if content is empty. By default, only arrays with length 0 are considered empty. */
   isEmpty?: (content: C) => boolean;
 }
 

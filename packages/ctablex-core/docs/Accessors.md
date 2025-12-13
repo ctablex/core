@@ -2,6 +2,8 @@
 
 Accessors are functions that extract values from data structures with **strong TypeScript support**. Unlike the weak type safety of generic context parameters, accessors provide **autocomplete and compile-time error detection**.
 
+**Note:** Most of the time, users don't directly interact with accessors. These types are used internally by the library (e.g., in `ContentValue` or `getKey` props).
+
 ## Overview
 
 The accessor system provides three types of accessors:
@@ -115,7 +117,7 @@ type PathAccessor<T, TDepth extends any[] = []> = /* ... */;
 
 Supports:
 
-- Object properties: `"user"`, `"user.name"`
+- Object properties: `"user"`, `"address"`
 - Nested paths: `"user.address.city"` (up to 5 levels deep)
 - Array indices for tuples: `tuple.0`, `tuple.1`
 
@@ -463,13 +465,13 @@ type User = {
 const city = useContent<User>();  // TypeScript cannot verify User matches actual context value
 
 // ✓ Strong type safety - accessor IS validated based on generic type
-<AccessorContent<User> accessor="address.city">  {/* ✓ TypeScript validates "address.city" exists on User */}
+<ContentValue<User> accessor="address.city">  {/* ✓ TypeScript validates "address.city" exists on User */}
   <DefaultContent />
-</AccessorContent>
+</ContentValue>
 
-<AccessorContent<User> accessor="address.country">  {/* ✗ Error! "country" doesn't exist on User */}
+<ContentValue<User> accessor="address.country">  {/* ✗ Error! "country" doesn't exist on User */}
   <DefaultContent />
-</AccessorContent>
+</ContentValue>
 ```
 
 **Key difference:**
@@ -512,10 +514,10 @@ access(arr, (a) => a[0]); // Use function instead
 
 ## Usage with Content Components
 
-Accessors are commonly used with `AccessorContent` and other content components:
+Accessors are commonly used with `ContentValue` and other content components:
 
 ```tsx
-import { AccessorContent, FieldContent } from '@ctablex/core';
+import { ContentValue, FieldContent } from '@ctablex/core';
 
 type User = {
   profile: {
@@ -525,24 +527,24 @@ type User = {
 };
 
 // Path accessor
-<AccessorContent<User> accessor="profile.name">
+<ContentValue<User> accessor="profile.name">
   <DefaultContent />
-</AccessorContent>
+</ContentValue>
 
 // Function accessor
-<AccessorContent<User> accessor={(user) => user.profile.age > 18}>
+<ContentValue<User> accessor={(user) => user.profile.age > 18}>
   <BooleanContent yes="Adult" no="Minor" />
-</AccessorContent>
+</ContentValue>
 
 // Undefined accessor (returns whole object)
-<AccessorContent<User> accessor={undefined}>
+<ContentValue<User> accessor={undefined}>
   <ObjectContent>...</ObjectContent>
-</AccessorContent>
+</ContentValue>
 ```
 
 ## Related
 
-- [AccessorContent](./Contents.md#accessorcontent) - Component using accessors
+- [ContentValue](./Contents.md#contentvalue) - Component using accessors
 - [FieldContent](./Contents.md#fieldcontent) - Simplified object field access
 - [Content Context](./ContentContext.md) - Context system foundation
 - [Micro-Context Pattern](./MICRO-CONTEXT.md) - Pattern overview

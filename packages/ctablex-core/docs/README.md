@@ -41,9 +41,9 @@ Components for transforming and accessing data:
 
 Utility components for common operations:
 
-- **AccessorContent** - Transform values using paths or functions
+- **ContentValue** - Transform values using paths or functions
 - **FieldContent** - Access object properties
-- **NullableContent** - Handle null/undefined values
+- **NullableContent**, **NullContent** - Handle null/undefined values
 - **DefaultContent** - Render primitive values
 
 #### [ArrayContent](./ArrayContent.md)
@@ -53,6 +53,7 @@ Components for array iteration:
 - **ArrayContent** - Iterate over arrays with index support
 - **IndexContent** - Display current iteration index
 - **IndexContext** - Context providing array index
+- **EmptyContent**, **NonEmptyContent** - Conditional rendering based on array emptiness
 
 #### [ObjectContent](./ObjectContent.md)
 
@@ -117,13 +118,13 @@ Start with: [ObjectContent](./ObjectContent.md)
 
 ```tsx
 <ContentProvider value={user}>
-  <AccessorContent accessor="profile.address.city">
+  <ContentValue accessor="profile.address.city">
     <DefaultContent />
-  </AccessorContent>
+  </ContentValue>
 </ContentProvider>
 ```
 
-Start with: [Contents](./Contents.md#accessorcontent) and [Accessors](./Accessors.md)
+Start with: [Contents](./Contents.md#contentvalue) and [Accessors](./Accessors.md)
 
 ### Conditional Rendering
 
@@ -139,32 +140,9 @@ Start with: [Contents](./Contents.md#accessorcontent) and [Accessors](./Accessor
 
 Start with: [Contents](./Contents.md#nullablecontent)
 
-## Type Safety
+## Type Safety Limitations
 
-### Important Understanding
-
-TypeScript type safety in ctablex has specific characteristics:
-
-1. **Generic types on components are NOT validated** - You can pass wrong types
-2. **Props ARE validated based on the generic** - Given a type, props get autocomplete
-3. **Nested components are NOT automatically typed** - Must add explicit generics
-
-Example:
-
-```tsx
-// ✓ getKey is type-safe with autocomplete
-<ArrayContent<User> getKey="id">
-  {/* ✗ No automatic type safety for nested components */}
-  <FieldContent field="name" />
-</ArrayContent>
-
-// ✓ Add explicit generic for type safety
-<ArrayContent<User> getKey="id">
-  <FieldContent<User> field="name" />
-</ArrayContent>
-```
-
-Read more: [MICRO-CONTEXT.md - Trade-offs](./MICRO-CONTEXT.md#trade-offs)
+⚠️ Micro-context provides weak type safety. Generic types must be manually specified and cannot be validated across context boundaries. See [MICRO-CONTEXT.md - Weak Type Safety](./MICRO-CONTEXT.md#weak-type-safety) for details.
 
 ## Common Pitfalls
 
@@ -231,10 +209,10 @@ Read more: Each component's Type Safety section
 
 ```tsx
 // ✗ Too deep
-<AccessorContent accessor="a.b.c.d.e.f" />
+<ContentValue accessor="a.b.c.d.e.f" />
 
 // ✓ Use function accessor instead
-<AccessorContent accessor={(obj) => obj.a.b.c.d.e.f} />
+<ContentValue accessor={(obj) => obj.a.b.c.d.e.f} />
 ```
 
 Read more: [Accessors - Limitations](./Accessors.md#limitations)
@@ -243,7 +221,7 @@ Read more: [Accessors - Limitations](./Accessors.md#limitations)
 
 - **[MICRO-CONTEXT.md](./MICRO-CONTEXT.md)** - Core pattern explanation
 - **[ContentContext.md](./ContentContext.md)** - ContentProvider, useContent, ContentContext
-- **[Contents.md](./Contents.md)** - AccessorContent, FieldContent, NullableContent, DefaultContent
+- **[Contents.md](./Contents.md)** - ContentValue, FieldContent, NullableContent, DefaultContent
 - **[ArrayContent.md](./ArrayContent.md)** - ArrayContent, IndexContent, IndexContext
 - **[ObjectContent.md](./ObjectContent.md)** - ObjectContent, KeyContent, KeyContext
 - **[Accessors.md](./Accessors.md)** - All accessor functions and types

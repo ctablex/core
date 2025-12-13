@@ -2,6 +2,12 @@
 
 Components for iterating over object properties and accessing object keys.
 
+## TL;DR
+
+- Use `<ObjectContent>` to iterate over object properties
+- Use `<KeyContent>` to display the current property key
+- Use `KeyContext`, `useKey` to access the current property key
+
 ## ObjectContent
 
 Iterates over object properties, rendering children for each key-value pair. Provides the property value, key, and index via context.
@@ -31,7 +37,7 @@ type ObjectGetKey<V extends object> = <K extends keyof V>(
 ### Behavior
 
 - Iterates over `Object.keys()` of the object from content context
-- Wraps each property value in a `ContentProvider`
+- Provides each property value via `ContentProvider`
 - Provides the property key via `KeyContext`
 - Provides the iteration index via `IndexContext`
 - Renders `join` content between properties (not before the first property)
