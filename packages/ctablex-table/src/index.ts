@@ -40,5 +40,5 @@ export { DefaultContent } from '@ctablex/core';
 export { NullableContent } from '@ctablex/core';
 export type { NullableContentProps } from '@ctablex/core';
 
-// compat
-export { ContentValue } from './compat/content-value';
+export { ContentValue } from '@ctablex/core';
+export type { ContentValueProps } from '@ctablex/core';
