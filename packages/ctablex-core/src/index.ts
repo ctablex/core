@@ -25,8 +25,10 @@ export type { NullContentProps } from './contents/null-content';
 export { FieldContent } from './contents/field-content';
 export type { FieldContentProps } from './contents/field-content';
 
-export { AccessorContent } from './contents/accessor-content';
-export type { AccessorContentProps } from './contents/accessor-content';
+export { ContentValue as AccessorContent } from './contents/content-value';
+export type { ContentValueProps as AccessorContentProps } from './contents/content-value';
+export { ContentValue } from './contents/content-value';
+export type { ContentValueProps } from './contents/content-value';
 
 export { ObjectContent } from './contents/object-content';
 export type { ObjectContentProps } from './contents/object-content';

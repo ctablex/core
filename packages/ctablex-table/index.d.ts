@@ -1,5 +1,7 @@
 import { Accessor } from '@ctablex/core';
 import { AccessorTo } from '@ctablex/core';
+import { ContentValue } from '@ctablex/core';
+import { ContentValueProps } from '@ctablex/core';
 import { DefaultContent } from '@ctablex/core';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
@@ -29,14 +31,9 @@ export declare interface ColumnsProps {
   children?: ReactNode;
 }
 
-export declare function ContentValue<D = any>(
-  props: ContentValueProps<D>,
-): JSX_2.Element;
+export { ContentValue };
 
-declare interface ContentValueProps<D> {
-  accessor: Accessor<D>;
-  children?: ReactNode;
-}
+export { ContentValueProps };
 
 export declare function DataTable<D>(props: DataTableProps<D>): JSX_2.Element;
 
