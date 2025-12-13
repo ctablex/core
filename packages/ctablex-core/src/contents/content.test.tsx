@@ -1,7 +1,7 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ContentProvider, useContent } from '../content-provider';
-import { AccessorContent } from './accessor-content';
+import { ContentValue } from './content-value';
 import { ArrayContent } from './array-content';
 import { DefaultContent } from './default-content';
 import { FieldContent } from './field-content';
@@ -178,9 +178,9 @@ describe('content', () => {
       <div data-testid="root">
         <ContentProvider value={data}>
           <ArrayContent<Data> join="|" getKey="name">
-            name: <AccessorContent<Data> accessor="name" />, color:{' '}
-            <AccessorContent<Data> accessor="info.color" />, weight:{' '}
-            <AccessorContent<Data> accessor={(item) => item.info.weight} />
+            name: <ContentValue<Data> accessor="name" />, color:{' '}
+            <ContentValue<Data> accessor="info.color" />, weight:{' '}
+            <ContentValue<Data> accessor={(item) => item.info.weight} />
           </ArrayContent>
         </ContentProvider>
       </div>,
@@ -627,7 +627,7 @@ describe('content', () => {
     render(
       <div data-testid="root">
         <div data-testid="accessor">
-          <AccessorContent value={[1, 2, 3]} accessor={(a) => a.length} />
+          <ContentValue value={[1, 2, 3]} accessor={(a) => a.length} />
         </div>
         <div data-testid="array">
           <ArrayContent value={[1, 2, 3]} join=" " />
@@ -648,9 +648,9 @@ describe('content', () => {
       <div data-testid="root">
         <div data-testid="accessor">
           <ContentProvider value={[4, 5]}>
-            <AccessorContent value={[1, 2, 3]} accessor={(a) => a.length} />
+            <ContentValue value={[1, 2, 3]} accessor={(a) => a.length} />
             {' vs '}
-            <AccessorContent<number[]> accessor={(a) => a.length} />
+            <ContentValue<number[]> accessor={(a) => a.length} />
           </ContentProvider>
         </div>
         <div data-testid="array">
@@ -666,7 +666,7 @@ describe('content', () => {
               <KeyContent />: <DefaultContent />
             </ObjectContent>
             {' vs '}
-            <AccessorContent<number[]> accessor={(a) => a.length} />
+            <ContentValue<number[]> accessor={(a) => a.length} />
             <ObjectContent join="|">
               <KeyContent />: <DefaultContent />
             </ObjectContent>

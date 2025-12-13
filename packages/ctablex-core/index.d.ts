@@ -29,16 +29,6 @@ export declare type Accessor<T> =
   | PathAccessor<T>
   | FnAccessor<T>;
 
-export declare function AccessorContent<V>(
-  props: AccessorContentProps<V>,
-): JSX_2.Element;
-
-export declare interface AccessorContentProps<V> {
-  accessor: Accessor<V>;
-  children?: ReactNode;
-  value?: V;
-}
-
 export declare type AccessorTo<T, R = any> =
   | undefined
   | null
@@ -109,6 +99,18 @@ export declare interface ContentProviderProps<V> {
   value: V;
   children?: ReactNode;
 }
+
+declare function ContentValue<V>(props: ContentValueProps<V>): JSX_2.Element;
+export { ContentValue as AccessorContent };
+export { ContentValue };
+
+declare interface ContentValueProps<V> {
+  accessor: Accessor<V>;
+  children?: ReactNode;
+  value?: V;
+}
+export { ContentValueProps as AccessorContentProps };
+export { ContentValueProps };
 
 export declare function DefaultContent(): JSX_2.Element;
 

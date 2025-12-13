@@ -3,14 +3,14 @@ import { access, Accessor } from '../accessor/accessor';
 import { ContentProvider, useContent } from '../content-provider';
 import { DefaultContent } from './default-content';
 
-export interface AccessorContentProps<V> {
+export interface ContentValueProps<V> {
   accessor: Accessor<V>;
   children?: ReactNode;
   value?: V;
 }
 
 const defaultChildren = <DefaultContent />;
-export function AccessorContent<V>(props: AccessorContentProps<V>) {
+export function ContentValue<V>(props: ContentValueProps<V>) {
   const { accessor, children = defaultChildren } = props;
   const content = useContent<V>(props.value);
   return (
