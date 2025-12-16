@@ -323,9 +323,13 @@ describe('user test - exploring @ctablex/core as a new user', () => {
         lastName: 'Doe',
       };
 
+      // Hmm, I had to add type annotation (u: User) here
+      // TypeScript couldn't infer it automatically from the ContentProvider
+      // Would be nice if the type flowed through, but I understand why it doesn't
+      // (ContentProvider is generic and the accessor is just a function parameter)
       const { container } = render(
         <ContentProvider value={user}>
-          <ContentValue accessor={(u) => `${u.firstName} ${u.lastName}`}>
+          <ContentValue accessor={(u: User) => `${u.firstName} ${u.lastName}`}>
             <DefaultContent />
           </ContentValue>
         </ContentProvider>
@@ -492,9 +496,12 @@ describe('user test - exploring @ctablex/core as a new user', () => {
         { id: 2, name: 'Bob' },
       ];
 
+      // Again, need to annotate the type (user: User) in the getKey function
+      // Same issue - type doesn't flow from ContentProvider to the callback
+      // A bit verbose but at least it's explicit and type-safe
       const { container } = render(
         <ContentProvider value={users}>
-          <ArrayContent getKey={(user, index) => `user-${user.id}-${index}`}>
+          <ArrayContent getKey={(user: User, index) => `user-${user.id}-${index}`}>
             <FieldContent field="name">
               <DefaultContent />
             </FieldContent>
@@ -646,7 +653,7 @@ describe('user test - exploring @ctablex/core as a new user', () => {
         const value = useContent<any>();
         return (
           <div>
-            {String(key)} = {value}
+            {String(key)} = {String(value)}
           </div>
         );
       };
@@ -672,6 +679,7 @@ describe('user test - exploring @ctablex/core as a new user', () => {
       expect(container.textContent).toContain('theme = dark');
       expect(container.textContent).toContain('debug = true');
       // useKey hook works great for custom components!
+      // Note: Had to use String(value) to display booleans - React doesn't render them by default
     });
 
     it('should provide index via useIndex', () => {
@@ -1519,7 +1527,9 @@ describe('user test - exploring @ctablex/core as a new user', () => {
           <div>
             Items:
             <FieldContent field="items">
-              <ArrayContent getKey={(item) => item.name} join=", ">
+              {/* Need inline type annotation here too - a bit ugly but necessary */}
+              {/* Would be cleaner if I could reference Invoice['items'][number] somehow? */}
+              <ArrayContent getKey={(item: { name: string; price: number }) => item.name} join=", ">
                 <FieldContent field="name" />
                 {' ($'}
                 <FieldContent field="price">
