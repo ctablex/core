@@ -21,5 +21,7 @@ import {} from './index'
 // you only allowed to import from index import {} from './index'
 // add comment how user think/feel (i should do foo because bar) or (we should use baz?) or (why that prop doesn't have doc/or that doc is obvios no need to be there. or it was good to mention x)
 // as user you only allowed to edit user.test.ts
+//
+// write your feeling as you go along
 
 describe('user test - exploring @ctablex/core as a new user', () => {});
