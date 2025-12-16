@@ -840,6 +840,70 @@ describe('user test - exploring @ctablex/core as a new user', () => {
 
       // Perfect! This pattern is super clean for optional fields.
     });
+
+    it('should use ContentValue with accessor=undefined for flexible prop/context pattern', () => {
+      // Wait, I just realized something from that review comment!
+      // ContentValue with value prop and accessor=undefined can make components
+      // accept data from EITHER props OR context. That's brilliant!
+
+      type User = {
+        name: string;
+        email?: string;
+      };
+
+      // Let me rewrite EmailDisplay to be more flexible
+      const FlexibleEmailDisplay = ({ user }: { user?: User }) => (
+        // Using ContentValue instead of ContentProvider
+        // If user prop is passed, it uses that. Otherwise, falls back to context!
+        <ContentValue value={user} accessor={undefined}>
+          <FieldContent field="email">
+            <NullableContent nullContent="No email provided">
+              <DefaultContent />
+            </NullableContent>
+          </FieldContent>
+        </ContentValue>
+      );
+
+      const userWithEmail: User = {
+        name: 'Alice',
+        email: 'alice@example.com',
+      };
+
+      const userWithoutEmail: User = {
+        name: 'Bob',
+      };
+
+      // Test 1: Using with prop directly (no ContentProvider needed!)
+      const { container: c1 } = render(<FlexibleEmailDisplay user={userWithEmail} />);
+      expect(c1.textContent).toBe('alice@example.com');
+
+      const { container: c2 } = render(<FlexibleEmailDisplay user={userWithoutEmail} />);
+      expect(c2.textContent).toBe('No email provided');
+
+      // Test 2: Using with context (prop is optional)
+      const { container: c3 } = render(
+        <ContentProvider value={userWithEmail}>
+          <FlexibleEmailDisplay />
+        </ContentProvider>
+      );
+      expect(c3.textContent).toBe('alice@example.com');
+
+      // Test 3: Prop overrides context!
+      const { container: c4 } = render(
+        <ContentProvider value={userWithEmail}>
+          <FlexibleEmailDisplay user={userWithoutEmail} />
+        </ContentProvider>
+      );
+      expect(c4.textContent).toBe('No email provided');
+      // Gets value from prop, not context!
+
+      // This is amazing! The component is now:
+      // 1. Usable standalone with props (traditional React)
+      // 2. Usable with context (micro-context pattern)
+      // 3. Props override context when both present
+      // This makes components incredibly flexible and reusable!
+      // Why didn't I think of this pattern earlier?
+    });
   });
 
   describe('NullContent - conditional rendering for nulls', () => {
@@ -1204,8 +1268,9 @@ describe('user test - exploring @ctablex/core as a new user', () => {
         // no address
       };
 
-      const UserDisplay = ({ user }: { user: User }) => (
-        <ContentProvider value={user}>
+      // Now using the flexible pattern! Making user optional and using ContentValue
+      const UserDisplay = ({ user }: { user?: User }) => (
+        <ContentValue value={user} accessor={undefined}>
           <div>
             <FieldContent field="name" />
             <FieldContent field="address">
@@ -1220,9 +1285,10 @@ describe('user test - exploring @ctablex/core as a new user', () => {
               </NullableContent>
             </FieldContent>
           </div>
-        </ContentProvider>
+        </ContentValue>
       );
 
+      // Works with direct props
       const { container: c1 } = render(<UserDisplay user={user1} />);
       expect(c1.textContent).toBe('Alice - NYC, USA');
 
@@ -1232,17 +1298,29 @@ describe('user test - exploring @ctablex/core as a new user', () => {
       const { container: c3 } = render(<UserDisplay user={user3} />);
       expect(c3.textContent).toBe('Charlie - No address');
 
+      // Also works with context!
+      const { container: c4 } = render(
+        <ContentProvider value={user1}>
+          <UserDisplay />
+        </ContentProvider>
+      );
+      expect(c4.textContent).toBe('Alice - NYC, USA');
+
       // Wow! NullableContent handles all the edge cases elegantly.
+      // AND now UserDisplay works with both props and context!
       // This pattern is really powerful for real-world data.
+      // I'm starting to see this as a best practice for reusable components.
     });
 
     it('should create reusable renderer components', () => {
       // One of the key features mentioned: reusable components
       // Let me create a generic formatter that works with any data
 
-      const CurrencyDisplay = () => {
-        const amount = useContent<number>();
-        return <span>${amount.toFixed(2)}</span>;
+      // Using the flexible pattern here too!
+      const CurrencyDisplay = ({ amount }: { amount?: number }) => {
+        // useContent with optional override - works with prop or context!
+        const value = useContent<number>(amount);
+        return <span>${value.toFixed(2)}</span>;
       };
 
       type Product = {
@@ -1255,18 +1333,39 @@ describe('user test - exploring @ctablex/core as a new user', () => {
         price: 99.99,
       };
 
-      const { container } = render(
+      // Test 1: Traditional context usage
+      const { container: c1 } = render(
         <ContentProvider value={product}>
           <FieldContent field="name" />: <FieldContent field="price">
             <CurrencyDisplay />
           </FieldContent>
         </ContentProvider>
       );
+      expect(c1.textContent).toBe('Widget: $99.99');
 
-      expect(container.textContent).toBe('Widget: $99.99');
+      // Test 2: Direct prop usage (no context needed!)
+      const { container: c2 } = render(
+        <div>
+          Total: <CurrencyDisplay amount={1234.56} />
+        </div>
+      );
+      expect(c2.textContent).toBe('Total: $1,234.56');
 
-      // This is powerful! CurrencyDisplay is reusable anywhere there's a number in context.
-      // It doesn't need to know about Product or price - just formats the current context value.
+      // Test 3: Prop overrides context
+      const { container: c3 } = render(
+        <ContentProvider value={99.99}>
+          <CurrencyDisplay amount={123.45} />
+        </ContentProvider>
+      );
+      expect(c3.textContent).toBe('$123.45');
+
+      // This is powerful! CurrencyDisplay now works:
+      // 1. With context (micro-context pattern)
+      // 2. With props (traditional React)
+      // 3. Anywhere in either mode!
+      // The useContent(amount) pattern is the key - it's like useContent but with optional override.
+      // Actually, I realize now that useContent ALWAYS supported this - it's in the docs!
+      // I just didn't fully appreciate how useful it is until now.
     });
 
     it('should compose multiple transformations', () => {
@@ -1565,12 +1664,16 @@ describe('user test - exploring @ctablex/core as a new user', () => {
   // ✓ Reusable renderers are powerful - write once, use anywhere
   // ✓ NullableContent, EmptyContent patterns are elegant for real-world data
   // ✓ ContentValue with path strings avoids deep nesting
+  // ✓ The flexible prop/context pattern (ContentValue with value prop + accessor=undefined, 
+  //   or useContent with optional value param) is BRILLIANT! Makes components work in both modes.
   //
   // OBSERVATIONS:
   // - Need to remember DefaultContent only works with primitives
   // - Must provide explicit children for ArrayContent with object arrays
   // - The nesting can get deep, but that's the nature of the pattern
   // - ContentValue with paths is better for deep access than nested FieldContent
+  // - The value prop + accessor=undefined pattern should probably be a best practice!
+  //   It makes components maximally flexible without any downside.
   //
   // QUESTIONS/WISHES:
   // - The docs are good, but some examples could show more complex real-world scenarios
@@ -1578,10 +1681,15 @@ describe('user test - exploring @ctablex/core as a new user', () => {
   // - The difference between ContentValue and FieldContent could be clearer up front
   //   (I figured out ContentValue is more powerful, but took some exploration)
   // - AccessorContent vs ContentValue naming - docs mention it's an alias, good to know
+  // - The flexible prop/context pattern deserves MORE emphasis in docs! It's so powerful
+  //   but I almost missed it. Maybe a dedicated section on "Building Flexible Components"?
   //
   // OVERALL: This is a really well-designed library! The micro-context pattern
   // is a fresh take on component composition. Once you understand the core concept
   // of "each component creates its own scoped context", everything else makes sense.
+  // The ability to make components work with BOTH props and context (via the value
+  // override pattern) is the cherry on top - it means you never have to choose
+  // between context-based and prop-based components. You can have both!
   // Would definitely use this for complex data rendering scenarios.
 });
 
