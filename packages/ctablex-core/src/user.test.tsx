@@ -1584,3 +1584,6 @@ describe('user test - exploring @ctablex/core as a new user', () => {
   // of "each component creates its own scoped context", everything else makes sense.
   // Would definitely use this for complex data rendering scenarios.
 });
+
+// review: if in UserDisplay you use `<ContentValue value={user} accessor={undefined}>` instead of ContentProvider and make user prop optional,
+// it will accept both prop and context value. Nice flexibility!
