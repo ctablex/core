@@ -23,6 +23,11 @@ type AllowedIndexes<
     Tuple extends readonly [infer _, ...infer Tail]
     ? AllowedIndexes<Tail, Keys | Tail['length']>
     : Keys;
+/**
+ * String literal type representing valid dot-separated paths through an object.
+ * Supports nested properties up to 5 levels deep.
+ * @example "user.address.city"
+ */
 export type PathAccessor<
   T,
   TDepth extends any[] = [],
@@ -46,6 +51,9 @@ type PathPrefix<T, TPrefix, TDepth extends any[]> = TPrefix extends keyof T &
   ? `${TPrefix}.${PathAccessor<T[TPrefix], [...TDepth, any]> & string}`
   : never;
 
+/**
+ * The type of the value at a given path in an object.
+ */
 export type PathAccessorValue<T, TProp> = 0 extends 1 & T
   ? any
   : T extends null | undefined
@@ -58,11 +66,22 @@ export type PathAccessorValue<T, TProp> = 0 extends 1 & T
           : undefined
       : never;
 
+/**
+ * String literal type representing paths through an object that return a specific type.
+ * Filters PathAccessor<T> to only include paths where the value extends R.
+ */
 export type PathAccessorTo<T, R> = {
   [K in PathAccessor<T>]: PathAccessorValue<T, K> extends R ? K : never;
 }[PathAccessor<T>] &
   string;
 
+/**
+ * Accesses a nested property using a dot-separated string path.
+ * Provides full type safety with autocomplete and compile-time error detection.
+ * @param t - The object to access
+ * @param path - Dot-separated path like "user.address.city"
+ * @returns The value at the specified path
+ */
 export function accessByPath<T, K extends PathAccessor<T>>(
   t: T,
   path: K,
@@ -71,6 +90,13 @@ export function accessByPath<T, K extends PathAccessor<T>>(
   return path.split('.').reduce((acc, key) => acc?.[key], t);
 }
 
+/**
+ * Accesses a nested property using a path constrained to return a specific type.
+ * Like accessByPath but only accepts paths that return values of type R.
+ * @param t - The object to access
+ * @param path - Dot-separated path that returns type R
+ * @returns The value at the specified path, typed as R
+ */
 export function accessByPathTo<
   R,
   T,
