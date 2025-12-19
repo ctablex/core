@@ -106,7 +106,6 @@ Because Table has default children, it expands to TableHeader + TableBody
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader />
     <TableBody />
@@ -118,7 +117,6 @@ TableHeader also has default children, it expands to HeaderRow
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>
       <HeaderRow />
@@ -132,7 +130,6 @@ header row also has default children, it expands to Columns
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>
       <HeaderRow>
@@ -148,7 +145,6 @@ columns read columns from context and render them here
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>
       <HeaderRow>
@@ -169,11 +165,11 @@ TableHeader provides IsHeaderContext (set to true). Column reads IsHeaderContext
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>
       <HeaderRow>
         <Columns>
+          {/* Name and Price are header props of Column */}
           <HeaderCell>Name</HeaderCell>
           <HeaderCell>Price</HeaderCell>
         </Columns>
@@ -188,7 +184,6 @@ TableBody also has default children, it expands to Rows
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
@@ -198,27 +193,27 @@ TableBody also has default children, it expands to Rows
 </DataTable>
 ```
 
-Rows with the help of ArrayContent iterates over products array, providing each item via ContentProvider
+Rows also has default children, it expands to Row
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
       <Rows>
-        <Row>{/* each product provided via context */}</Row>
+        <Row />
       </Rows>
     </TableBody>
   </Table>
 </DataTable>
 ```
 
+Rows with the help of ArrayContent iterates over products array, providing each item via ContentProvider
+
 you can think of it like this:
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
@@ -238,7 +233,6 @@ Row also has default children, it expands to Columns
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
@@ -256,7 +250,6 @@ Columns read columns from context and render them here
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
@@ -275,11 +268,34 @@ Columns read columns from context and render them here
 </DataTable>
 ```
 
-Now, Column detects that it is not in the header context, so it renders Cell. DefaultContent is default child of Column, so it renders DefaultContent for name column. For price column, it renders NumberContent as child.
+Column also has default children, so if no children are provided, it uses `<DefaultContent />`, so it renders DefaultContent for name column. For price column, it renders its own child `<NumberContent digits={2} /> dollars`
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows>
+        <Row>
+          <Columns>
+            <Column header="Name" accessor="name">
+              <DefaultContent />
+            </Column>
+            <Column header="Price" accessor="price">
+              <NumberContent digits={2} /> dollars
+            </Column>
+          </Columns>
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+Now, Column detects that it is not in the header context, so it renders Cell.
+
+```tsx
+<DataTable data={products}>
   <Table>
     <TableHeader>{/* ...header as before... */}</TableHeader>
     <TableBody>
@@ -300,6 +316,33 @@ Now, Column detects that it is not in the header context, so it renders Cell. De
 </DataTable>
 ```
 
+cell extracts the value from content context using accessor and provides it via ContentProvider to its children. and read value via `useContent()` in DefaultContent and NumberContent and renders accordingly.
+
+Table, TableHeader, TableBody, HeaderRow, Row, HeaderCell, Cell all use element rendering system to render appropriate HTML elements like `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<th>`, `<td>` So
+
+```tsx
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {/* <Rows /> do not render dom itself */}
+    <tr>
+      <td>{product[0].name}</td>
+      <td>{product[0].price.toFixed(2)} dollars</td>
+    </tr>
+    <tr>
+      <td>{product[1].name}</td>
+      <td>{product[1].price.toFixed(2)} dollars</td>
+    </tr>
+    {/* ... for each product ... */}
+  </tbody>
+</table>
+```
+
 until now we have seen how the code you write transforms step by step into what actually renders.
 
 ## Example Rendering Elements
@@ -310,39 +353,39 @@ In the last example no custom elements were provided, so all components used def
 
 ```tsx
 const elements = {
-    table: <table className="fancy-table" />,
-    thead: <thead className="fancy-thead" />,
-    tbody: <tbody className="fancy-tbody" />,
-    tr: <tr className="fancy-tr" />,
-    th: <th className="fancy-th" />,
-    td: <td className="fancy-td" />,
-  }
+  table: <table className="fancy-table" />,
+  thead: <thead className="fancy-thead" />,
+  tbody: <tbody className="fancy-tbody" />,
+  tr: <tr className="fancy-tr" />,
+  th: <th className="fancy-th" />,
+  td: <td className="fancy-td" />,
+};
 
-<TableElementProvider
-  value={elements}
->
-  <DataTable data={products}>
-    <Columns>
-      <Column header="Name" accessor="name" />
-      <Column
-        header="Price"
-        accessor="price"
-        el={<td className="price-cell" />}
-        thEl={<th className="price-header" />}
-      >
-        <NumberContent digits={2} /> dollars
-      </Column>
-    </Columns>
-    <Table>
-      <TableHeader />
-      <TableBody>
-        <Rows>
-          <Row el={<CustomRow />} />
-        </Rows>
-      </TableBody>
-    </Table>
-  </DataTable>
-</TableElementProvider>
+return (
+  <TableElementProvider value={elements}>
+    <DataTable data={products}>
+      <Columns>
+        <Column header="Name" accessor="name" />
+        <Column
+          header="Price"
+          accessor="price"
+          el={<td className="price-cell" />}
+          thEl={<th className="price-header" />}
+        >
+          <NumberContent digits={2} /> dollars
+        </Column>
+      </Columns>
+      <Table>
+        <TableHeader />
+        <TableBody>
+          <Rows>
+            <Row el={<CustomRow />} />
+          </Rows>
+        </TableBody>
+      </Table>
+    </DataTable>
+  </TableElementProvider>
+);
 ```
 
 Table will render `<table className="fancy-table">`, because `table` element is provided in context. same for TableHeader, Row in TableHeader, TableBody, HeaderCell and Cell. child props will be added to the elements via `addProps`, preserving original props.
@@ -350,6 +393,14 @@ Table will render `<table className="fancy-table">`, because `table` element is 
 but for price column, `el` and `thEl` props are provided, so those will be used instead of context elements.
 
 for Row, `el` prop is provided, so that will be used instead of context element. `<CustomRow />` will be rendered for each row. it can have access to ContentContext via `useContent` and render customized row based on data.
+
+```tsx
+<Row el={<CustomRow />} />
+// will become. Columns is default children of Row
+<CustomRow>
+  <Columns/>
+</CustomRow>
+```
 
 addProps is double cloning technique that preserves original props of elements while adding new props like children.
 
