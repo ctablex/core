@@ -87,22 +87,22 @@ Let's start with a concrete example showing the transformation from what you wri
 </DataTable>
 ```
 
-<!-- we will go step by step how it works -->
+Now let's go step by step to see how this transformation happens.
 
-<!-- step one: DataTable extract columns children. immidate children have Type.__columns__ -->
-<!-- provides columns via ColumnsContext and remove columns from other children. -->
-<!-- now this is what rendered -->
+**Step 1: DataTable extracts and removes Columns**
+
+DataTable extracts column definitions from its immediate children (those marked with `__COLUMNS__`), provides them via `ColumnsContext`, and removes them from the render tree. After this step, here's what actually renders:
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns removed by DataTable and provided via context */}
+  {/* Columns with __COLUMNS__ marker removed by DataTable and provided via context */}
   <Table />
 </DataTable>
 ```
 
-<!-- step two: -->
+**Step 2: Table expands to default children**
 
-because Table has default children, it expands to TableHeader + TableBody
+Because Table has default children, it expands to TableHeader + TableBody
 
 ```tsx
 <DataTable data={products}>
@@ -113,8 +113,6 @@ because Table has default children, it expands to TableHeader + TableBody
   </Table>
 </DataTable>
 ```
-
-<!-- step 3 -->
 
 TableHeader also has default children, it expands to HeaderRow
 
@@ -167,7 +165,7 @@ columns read columns from context and render them here
 </DataTable>
 ```
 
-TableHeader provides IsHeaderContext. Column read IsHeaderContext and detects that it is rendering in the header, so it renders HeaderCell
+TableHeader provides IsHeaderContext (set to true). Column reads IsHeaderContext via useIsHeader() and detects that it is rendering in the header, so it renders HeaderCell
 
 ```tsx
 <DataTable data={products}>
@@ -488,34 +486,46 @@ useColumns is not public API. so it is better no mention of it
 
 Any component in the tree can access the extracted column definitions by calling `useColumns()`.
 
-## Column Behavior: Definition vs Rendering
+## Column Behavior: Extraction and Rendering
 
-`Columns` components behave differently depending on the current "part" context. This dual behavior is what enables the same column definitions to render as headers in `<thead>` and data cells in `<tbody>`.
+`Column` components render differently depending on the `IsHeaderContext`. This dual behavior is what enables the same column definitions to render as headers in `<thead>` and data cells in `<tbody>`.
 
-### Part Context System
+### Column Extraction
 
-The library uses `PartContext` to track which section of the table is currently rendering:
-
-### Definition Phase
-
-When `DataTable` renders, it sets the part to `DEFINITION_PART`:
+When `DataTable` renders, it extracts and removes `Columns` components:
 
 ```tsx
 // In src/data-table.tsx
-export const DEFINITION_PART = '__DEFINITION__';
+export function DataTable<D>(props: DataTableProps<D>) {
+  const { children } = props;
+  const data = useContent(props.data);
 
-// DataTable wraps children in DEFINITION_PART context
-<PartProvider value={DEFINITION_PART}>
-  <ColumnsProvider value={columns}>{children}</ColumnsProvider>
-</PartProvider>;
+  // Extract columns marked with __COLUMNS__
+  const columns = useMemo(() => findColumns(children), [children]);
+
+  // Get children without the columns
+  const otherChildren = useMemo(
+    () => findNonColumnsChildren(children),
+    [children],
+  );
+
+  return (
+    <ContentProvider value={data}>
+      <ColumnsProvider value={columns}>{otherChildren}</ColumnsProvider>
+    </ContentProvider>
+  );
+}
 ```
 
-During this phase, `Columns` components return `null` to prevent rendering:
+**Key point**: Components marked with `__COLUMNS__` (like `<Columns>`) are extracted from the children and stored in context, then removed from the render tree. They are provided via `ColumnsProvider` and can be rendered later by any `<Columns />` component in the tree.
+
+### Column Rendering
+
+When a `<Columns />` component renders (e.g., inside `HeaderRow` or `Row`), it retrieves the stored columns from context and renders them:
 
 ```tsx
 // In src/columns/columns.tsx
 export function Columns(props: ColumnsProps) {
-  const currentPart = usePart();
   const columns = useColumns();
   const { part } = props;
 
@@ -524,71 +534,58 @@ export function Columns(props: ColumnsProps) {
     [columns, part],
   );
 
-  // During definition phase, don't render anything
-  if (currentPart === DEFINITION_PART) {
-    return null;
-  }
-
-  // During rendering phase, render the appropriate columns
+  // Always renders the appropriate columns
   return <>{partColumns}</>;
 }
 ```
 
-**This is crucial**: You see `<Columns>` at the top level of `DataTable`, but they don't render. They're only used for extraction and storage in context. The actual rendering happens later when components like `TableHeader` and `TableBody` request them.
+**This is the key pattern**: You define `<Columns>` at the top level of `DataTable` (where they're extracted), but they actually render when you place `<Columns />` elsewhere in the tree (like in `HeaderRow` or `Row`).
 
-### Rendering Phase
+### IsHeaderContext for Conditional Rendering
 
-When table components render (e.g., `TableHeader`, `TableBody`), they set different part contexts. This tells `Column` components how to render themselves.
+The `TableHeader` component provides `IsHeaderContext` to tell `Column` components they should render as header cells:
 
-**TableHeader sets `HEADER_PART`:**
+**TableHeader provides IsHeaderContext:**
 
 ```tsx
 // In src/table/table-header.tsx
-export const HEADER_PART = '__HEADER__';
+import { IsHeaderProvider } from '../columns/is-header-context';
 
 export function TableHeader(props: TableHeaderProps) {
   const { children = defaultChildren } = props;
   const elements = useTableElements();
   const el = addProps(props.el ?? elements.thead, { children });
 
-  // Wrap children in HEADER_PART context
-  return <PartProvider value={HEADER_PART}>{el}</PartProvider>;
+  // Wrap children in IsHeaderProvider (sets IsHeaderContext to true)
+  return <IsHeaderProvider>{el}</IsHeaderProvider>;
 }
 ```
 
-**TableBody sets `BODY_PART`:**
+**TableBody and TableFooter don't provide IsHeaderContext:**
 
 ```tsx
 // In src/table/table-body.tsx
-export const BODY_PART = '__BODY__';
-
 export function TableBody(props: TableBodyProps) {
   const { children = defaultChildren } = props;
   const elements = useTableElements();
   const el = addProps(props.el ?? elements.tbody, { children });
-
-  // Wrap children in BODY_PART context
-  return <PartProvider value={BODY_PART}>{el}</PartProvider>;
+  // No IsHeaderProvider - IsHeaderContext defaults to false
+  return el;
 }
 ```
-
-**TableFooter sets `FOOTER_PART`:**
 
 ```tsx
 // In src/table/table-footer.tsx
-export const FOOTER_PART = '__FOOTER__';
-
 export function TableFooter(props: TableFooterProps) {
-  const { children = defaultChildren } = props;
+  const { children } = props;
   const elements = useTableElements();
   const el = addProps(props.el ?? elements.tfoot, { children });
-
-  // Wrap children in FOOTER_PART context
-  return <PartProvider value={FOOTER_PART}>{el}</PartProvider>;
+  // No IsHeaderProvider - IsHeaderContext defaults to false
+  return el;
 }
 ```
 
-These part contexts are what enable the same `Column` definition to render differently in different sections of the table.
+This `IsHeaderContext` is what enables the same `Column` definition to render differently in different sections of the table.
 
 ### Column Rendering by Part
 
@@ -658,22 +655,24 @@ This allows different sections of the table to render different column sets - pe
 
 ### Column Component Dual Behavior
 
-The `Column` component is smart - it checks the current part context and renders differently:
+The `Column` component checks `IsHeaderContext` and renders differently:
 
 ```tsx
 // In src/columns/column.tsx
+import { useIsHeader } from './is-header-context';
+
 const defaultChildren = <DefaultContent />;
 
 export function Column<D = any>(props: ColumnProps<D>) {
   const { children = defaultChildren } = props;
-  const part = usePart();
+  const isHeader = useIsHeader();
 
-  // In HEADER_PART context, render as a header cell
-  if (part === HEADER_PART) {
+  // In header context (IsHeaderContext = true), render as a header cell
+  if (isHeader) {
     return <HeaderCell el={props.thEl}>{props.header}</HeaderCell>;
   }
 
-  // In BODY_PART or FOOTER_PART context, render as a data cell
+  // In body/footer context (IsHeaderContext = false), render as a data cell
   return (
     <Cell accessor={props.accessor} el={props.el}>
       {children}
@@ -684,19 +683,19 @@ export function Column<D = any>(props: ColumnProps<D>) {
 
 This single component definition creates both:
 
-- **Header cells** (`<th>`) when rendered in `TableHeader`
-- **Data cells** (`<td>`) when rendered in `TableBody` or `TableFooter`
+- **Header cells** (`<th>`) when rendered inside `TableHeader` (IsHeaderContext = true)
+- **Data cells** (`<td>`) when rendered in `TableBody` or `TableFooter` (IsHeaderContext = false/undefined)
 
 **Example flow:**
 
 ```tsx
 <Column header="Name" accessor="name" />
 
-// When rendered in TableHeader (HEADER_PART):
+// When rendered inside TableHeader (IsHeaderContext = true):
 <HeaderCell el={undefined}>Name</HeaderCell>
 // → Renders: <th>Name</th>
 
-// When rendered in TableBody (BODY_PART):
+// When rendered inside TableBody (IsHeaderContext = false):
 <Cell accessor="name">
   <DefaultContent />
 </Cell>
@@ -985,27 +984,27 @@ Let's see how it expands step by step:
 
 **Final: What actually executes**
 
-Now with part contexts and element rendering:
+Now with IsHeaderContext and element rendering:
 
 ```tsx
 <DataTable data={products}>
-  {/* Part: DEFINITION_PART - Columns returns null */}
+  {/* Columns definition extracted and removed from render tree */}
 
   <table>
-    {/* Part: HEADER_PART */}
+    {/* IsHeaderContext = true */}
     <thead>
       <tr>
-        {/* Columns renders, Column detects HEADER_PART */}
+        {/* Columns renders, Column detects IsHeaderContext = true */}
         <th>Name</th>
         <th>Price</th>
       </tr>
     </thead>
 
-    {/* Part: BODY_PART */}
+    {/* IsHeaderContext = false (default) */}
     <tbody>
       {/* Rows iterates products, each iteration: */}
       <tr>
-        {/* Columns renders, Column detects BODY_PART */}
+        {/* Columns renders, Column detects IsHeaderContext = false */}
         <td>{name value}</td>
         <td>{price value}</td>
       </tr>
@@ -1304,8 +1303,8 @@ This mixed approach gives you the best of both worlds: global consistency with t
 
 Understanding these four key systems helps you leverage the full power of ctablex/table:
 
-1. **Column Extraction**: `__COLUMNS__` marker + `findColumns` → `ColumnsContext`
-2. **Dual Behavior**: `DEFINITION_PART` (extraction) vs rendering parts (header/body/footer)
+1. **Column Extraction**: `__COLUMNS__` marker + `findColumns` → columns stored in `ColumnsContext` and removed from render tree
+2. **Dual Behavior**: `Column` uses `IsHeaderContext` to render as `HeaderCell` (in header) or `Cell` (in body/footer)
 3. **Default Children**: Components expand to sensible defaults, reducing boilerplate
 4. **Element System**: Context + props + `addProps` = flexible customization
 
