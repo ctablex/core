@@ -44,32 +44,30 @@ Let's start with a concrete example showing the transformation from what you wri
 
 ```tsx
 <DataTable data={products}>
-  {/* Provided part: __DEFINITION__ */}
-  {/* Columns definitions don't render during the definition phase */}
-  {null}
+  {/* Columns definitions removed by data table */}
 
   {/* Table expands to default children and renders <table> element */}
   <Table>
-    {/* TableHeader sets part context: HEADER_PART and renders <thead> */}
+    {/* TableHeader sets IsHeaderContext to true and renders <thead> */}
     <TableHeader>
       {/* HeaderRow renders <tr> */}
       <HeaderRow>
-        {/* Columns now renders because we're in HEADER_PART */}
+        {/* Columns now renders */}
         <Columns>
-          {/* Column components detect HEADER_PART and render as HeaderCell */}
+          {/* Column components detect IsHeaderContext and render as HeaderCell */}
           <HeaderCell>Name</HeaderCell>
           <HeaderCell>Price</HeaderCell>
         </Columns>
       </HeaderRow>
     </TableHeader>
-    {/* TableBody sets part context: BODY_PART and renders <tbody> */}
+    {/* TableBody renders <tbody> */}
     <TableBody>
-      {/* Rows iterates over products array, providing each via ContentProvider */}
+      {/* Rows iterates over products array, providing each via ContentProvider (using ArrayContent) */}
       <Rows>
         {/* Each product is provided via context to Row + render <tr> */}
         <Row>
-          {/* Columns renders again, but in BODY_PART context */}
-          {/* Column components detect BODY_PART and render as Cell */}
+          {/* Columns renders again */}
+          {/* Column components detect IsHeaderContext is not set and render as Cell */}
           <Columns>
             {/* Cell extracts "name" field and provides it via ContentProvider */}
             <Cell accessor="name">
@@ -89,10 +87,294 @@ Let's start with a concrete example showing the transformation from what you wri
 </DataTable>
 ```
 
-This example demonstrates the four key systems we'll explore:
+<!-- we will go step by step how it works -->
+
+<!-- step one: DataTable extract columns children. immidate children have Type.__columns__ -->
+<!-- provides columns via ColumnsContext and remove columns from other children. -->
+<!-- now this is what rendered -->
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table />
+</DataTable>
+```
+
+<!-- step two: -->
+
+because Table has default children, it expands to TableHeader + TableBody
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader />
+    <TableBody />
+  </Table>
+</DataTable>
+```
+
+<!-- step 3 -->
+
+TableHeader also has default children, it expands to HeaderRow
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>
+      <HeaderRow />
+    </TableHeader>
+    <TableBody />
+  </Table>
+</DataTable>
+```
+
+header row also has default children, it expands to Columns
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>
+      <HeaderRow>
+        <Columns />
+      </HeaderRow>
+    </TableHeader>
+    <TableBody />
+  </Table>
+</DataTable>
+```
+
+columns read columns from context and render them here
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>
+      <HeaderRow>
+        <Columns>
+          <Column header="Name" accessor="name" />
+          <Column header="Price" accessor="price">
+            <NumberContent digits={2} /> dollars
+          </Column>
+        </Columns>
+      </HeaderRow>
+    </TableHeader>
+    <TableBody />
+  </Table>
+</DataTable>
+```
+
+TableHeader provides IsHeaderContext. Column read IsHeaderContext and detects that it is rendering in the header, so it renders HeaderCell
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>
+      <HeaderRow>
+        <Columns>
+          <HeaderCell>Name</HeaderCell>
+          <HeaderCell>Price</HeaderCell>
+        </Columns>
+      </HeaderRow>
+    </TableHeader>
+    <TableBody />
+  </Table>
+</DataTable>
+```
+
+TableBody also has default children, it expands to Rows
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows />
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+Rows with the help of ArrayContent iterates over products array, providing each item via ContentProvider
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows>
+        <Row>{/* each product provided via context */}</Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+you can think of it like this:
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <ContentProvider value={products[0]}>
+        <Row />
+      </ContentProvider>
+      <ContentProvider value={products[1]}>
+        <Row />
+      </ContentProvider>
+      {/* ... for each product ... */}
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+Row also has default children, it expands to Columns
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows>
+        <Row>
+          <Columns />
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+Columns read columns from context and render them here
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows>
+        <Row>
+          <Columns>
+            <Column header="Name" accessor="name" />
+            <Column header="Price" accessor="price">
+              <NumberContent digits={2} /> dollars
+            </Column>
+          </Columns>
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+Now, Column detects that it is not in the header context, so it renders Cell. DefaultContent is default child of Column, so it renders DefaultContent for name column. For price column, it renders NumberContent as child.
+
+```tsx
+<DataTable data={products}>
+  {/* Columns removed by DataTable and provided via context */}
+  <Table>
+    <TableHeader>{/* ...header as before... */}</TableHeader>
+    <TableBody>
+      <Rows>
+        <Row>
+          <Columns>
+            <Cell accessor="name">
+              <DefaultContent />
+            </Cell>
+            <Cell accessor="price">
+              <NumberContent digits={2} /> dollars
+            </Cell>
+          </Columns>
+        </Row>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+until now we have seen how the code you write transforms step by step into what actually renders.
+
+## Example Rendering Elements
+
+now see how each component renders the appropriate HTML elements like `<table>`, `<th>`, `<td>`, etc.
+
+In the last example no custom elements were provided, so all components used default HTML elements (e.g. `<table>`, `<th>`, `<td>`). You can also provide custom elements via `TableElementProvider` or `el` props.
+
+```tsx
+const elements = {
+    table: <table className="fancy-table" />,
+    thead: <thead className="fancy-thead" />,
+    tbody: <tbody className="fancy-tbody" />,
+    tr: <tr className="fancy-tr" />,
+    th: <th className="fancy-th" />,
+    td: <td className="fancy-td" />,
+  }
+
+<TableElementProvider
+  value={elements}
+>
+  <DataTable data={products}>
+    <Columns>
+      <Column header="Name" accessor="name" />
+      <Column
+        header="Price"
+        accessor="price"
+        el={<td className="price-cell" />}
+        thEl={<th className="price-header" />}
+      >
+        <NumberContent digits={2} /> dollars
+      </Column>
+    </Columns>
+    <Table>
+      <TableHeader />
+      <TableBody>
+        <Rows>
+          <Row el={<CustomRow />} />
+        </Rows>
+      </TableBody>
+    </Table>
+  </DataTable>
+</TableElementProvider>
+```
+
+Table will render `<table className="fancy-table">`, because `table` element is provided in context. same for TableHeader, Row in TableHeader, TableBody, HeaderCell and Cell. child props will be added to the elements via `addProps`, preserving original props.
+
+but for price column, `el` and `thEl` props are provided, so those will be used instead of context elements.
+
+for Row, `el` prop is provided, so that will be used instead of context element. `<CustomRow />` will be rendered for each row. it can have access to ContentContext via `useContent` and render customized row based on data.
+
+addProps is double cloning technique that preserves original props of elements while adding new props like children.
+
+```ts
+function addProps(el: ReactElement, props: Record<string, any>) {
+  return cloneElement(cloneElement(el, props), el.props);
+}
+```
+
+For example, in `Table` component:
+
+```ts
+function Table(props: TableProps) {
+  const { children = defaultChildren } = props;
+  const elements = useTableElements();
+  return addProps(props.el ?? elements.table, { children });
+}
+```
+
+This examples demonstrates the four key systems we'll explore:
 
 1. **Column Extraction**: `Columns` are extracted from DataTable children and stored in context
-2. **Part-Based Rendering**: Same `Column` definitions render differently based on context (header vs body)
+2. **Part-Based Rendering**: Same `Column` definitions render differently based on context (header vs other)
 3. **Default Children**: `<Table />` automatically expands to header + body structure
 4. **Element System**: Components render appropriate HTML elements (`<table>`, `<th>`, `<td>`, etc.)
 
@@ -104,10 +386,11 @@ The column system uses a two-phase approach: **definition** (extraction) and **r
 
 ### DataTable: Extraction and Context Setup
 
-`DataTable` has two primary responsibilities:
+`DataTable` has three primary responsibilities:
 
 1. **Extract column definitions** from its immediate children
-2. **Provide data** via ContentProvider for the entire table
+2. **Remove column definitions** from the rendered output
+3. **Provide data** via ContentProvider for the entire table
 
 ### The `__COLUMNS__` Marker
 
@@ -199,7 +482,7 @@ MyColumns.__COLUMNS__ = true; // Mark as column container
 
 The extracted columns are provided to the component tree via `ColumnsContext`:
 
-<!-- columns context is internal. it is good user know that there is columns context which is provided by data table and consumed by <Columns/> component 
+<!-- columns context is internal. it is good user know that there is columns context which is provided by data table and consumed by <Columns/> component
 useColumns is not public API. so it is better no mention of it
 -->
 
@@ -800,7 +1083,6 @@ export interface TableElements {
 export const TableElementsContext = createContext<TableElements | undefined>(
   undefined,
 );
-
 ```
 
 By default, standard HTML elements are used:
