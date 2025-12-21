@@ -68,9 +68,9 @@ Should contain `Columns` definitions and a `Table` component.
 ### What It Does
 
 1. Provides data array via `ContentProvider`
-2. Extracts column definitions from children
-3. Provides columns via `ColumnsProvider`
-4. Sets up `DEFINITION_PART` context for column extraction
+2. Extracts column definitions from children (those marked with `__COLUMNS__`)
+3. Removes extracted columns from the render tree
+4. Provides columns via `ColumnsProvider` for later rendering
 
 ### Type Parameter
 
@@ -204,7 +204,7 @@ Content inside the header.
 ### What It Does
 
 1. Renders `<thead>` element
-2. Sets `HEADER_PART` context so columns render headers
+2. Provides `IsHeaderContext` (set to true) so `Column` components render as header cells
 
 ---
 
@@ -267,7 +267,7 @@ Content inside the body.
 ### What It Does
 
 1. Renders `<tbody>` element
-2. Sets `BODY_PART` context for row rendering
+2. Does not provide `IsHeaderContext` (defaults to false), so `Column` components render as data cells
 
 ---
 
@@ -309,7 +309,7 @@ Footer content, typically custom rows with summary data.
 ### What It Does
 
 1. Renders `<tfoot>` element
-2. Sets `FOOTER_PART` context
+2. Does not provide `IsHeaderContext` (defaults to false), so `Column` components render as data cells
 
 ---
 
@@ -444,14 +444,16 @@ function MyColumn() {
 
 ### What It Does
 
-When rendering in `DEFINITION_PART`:
+When defined at the top level of `DataTable`:
 
-- Returns `null` (column extraction phase)
+- The component is extracted and removed from the render tree
+- Its children are provided in `ColumnsContext`
 
-When rendering in other parts:
+When rendered inside the table structure (e.g., in `HeaderRow` or `Row`):
 
+- Retrieves provided columns from context
 - Filters columns by the `part` prop
-- Renders matching columns
+- Renders matching `Column` components
 
 ---
 
@@ -608,15 +610,17 @@ Custom element for the header cell (`<th>`).
 
 ### What It Does
 
-**In `HEADER_PART`:**
+**When IsHeaderContext is true (inside TableHeader):**
 
-- Renders `<HeaderCell>` with `header` prop content
+- Renders `<HeaderCell>` with `header` prop as children
+- use `thEl` if provided, otherwise `<th>`
 
-**In other parts:**
+**When IsHeaderContext is false/undefined (inside TableBody or TableFooter):**
 
 - Renders `<Cell>` with:
   - Value extracted via `accessor`
   - Value provided to children via `ContentProvider`
+- use `el` if provided, otherwise `<td>`
 
 ### Type Parameter
 

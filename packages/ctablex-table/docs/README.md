@@ -35,7 +35,7 @@ Guide to customizing table rendering at every level: using the `el` prop on indi
 
 ### HOW-IT-WORKS.md
 
-In-depth explanation of the internal architecture including the three-context system (Content, Part, Columns), two-phase rendering (column extraction and rendering), part-based rendering, data flow, component lifecycle, and performance considerations. **Read this for deep understanding of the internals.**
+In-depth explanation of the internal architecture including the context system (Content,  Columns), two-phase rendering (column extraction and rendering), part-based rendering, data flow, component lifecycle, and performance considerations. **Read this for deep understanding of the internals.**
 
 ## Related Documentation
 

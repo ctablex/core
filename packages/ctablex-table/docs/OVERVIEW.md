@@ -18,7 +18,7 @@ import { DataTable, Columns, Column, Table } from '@ctablex/table';
 const products = [
   { id: 1, name: 'Laptop', price: 999, inStock: true },
   { id: 2, name: 'Mouse', price: 29, inStock: false },
-  { id: 3, name: 'Keyboard', price: 79, inStock: true },
+  { id: 3, name: 'Keyboard', price: 79, inStock: true, description: 'Mechanical keyboard' },
 ];
 
 function ProductTable() {
@@ -34,7 +34,7 @@ function ProductTable() {
 }
 ```
 
-This renders a basic HTML table with three columns. The library handles:
+This renders a basic HTML table with two columns. The library handles:
 
 - Array iteration over products
 - Column headers
@@ -59,12 +59,11 @@ Instead of passing data through props, **@ctablex/table** uses React Context to 
 </DataTable>
 ```
 
-**What actually renders:**
+**What actually renders:** Table components has proper default children that expand to full structure:
 
 ```tsx
 <DataTable data={products}>
-  {/* Columns definitions don't render during the definition phase */}
-  {null}
+  {/* Columns definitions are extracted and removed from the render tree by DataTable */}
 
   {/* Table expands to its default children */}
   <Table>
@@ -73,8 +72,8 @@ Instead of passing data through props, **@ctablex/table** uses React Context to 
         {/* Column definitions are rendered as headers */}
         <Columns>
           {/* HeaderCell use "header" prop to render <th> */}
-          <Column header="Name" />
-          <Column header="Price" />
+          <HeaderCell>Name</HeaderCell>
+          <HeaderCell>Price</HeaderCell>
         </Columns>
       </HeaderRow>
     </TableHeader>
@@ -86,13 +85,13 @@ Instead of passing data through props, **@ctablex/table** uses React Context to 
           {/* Column definitions are rendered as cells */}
           <Columns>
             {/* Accessor extracts "name" field and provide it via context to render <td> */}
-            <Column accessor="name">
+            <Cell accessor="name">
               <DefaultContent />
-            </Column>
+            </Cell>
             {/* Accessor extracts "price" field and provide it via context to render <td> */}
-            <Column accessor="price">
+            <Cell accessor="price">
               <DefaultContent />
-            </Column>
+            </Cell>
           </Columns>
         </Row>
       </Rows>
@@ -310,7 +309,7 @@ type Product = {
 </DataTable>;
 ```
 
-⚠️ **Note:** Generics must be added manually. TypeScript cannot automatically infer types across context boundaries. See the [micro-context type safety limitations](@ctablex/core/docs/MICRO-CONTEXT.md#type-safety-limitations) for details.
+⚠️ **Note:** Generics must be added manually. TypeScript cannot automatically infer types across context boundaries. See the [micro-context type safety limitations](../../ctablex-core/docs/MICRO-CONTEXT.md#weak-type-safety) for details.
 
 ## Common Patterns
 
