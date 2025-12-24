@@ -498,6 +498,45 @@ You can render more than one row per item. The `part` prop will help you define 
 </DataTable>
 ```
 
+You can integrate stateful components directly into the table structure to create interactive tables. A common pattern is expandable rows that reveal additional details on demand:
+
+```tsx
+<DataTable data={data}>
+  <Columns>
+    <Column>
+      <ExpandButton />
+    </Column>
+    <Column accessor="name" header="Name" />
+    <Column accessor="price" header="Price" />
+  </Columns>
+  <Columns part="detail">
+    <Column accessor="description" el={<td colSpan={3} />} />
+  </Columns>
+  <Table>
+    <TableHeader />
+    <TableBody>
+      <Rows>
+        <OpenControl>
+          <Row />
+          <ExpandableRow>
+            <Columns part="detail" />
+          </ExpandableRow>
+        </OpenControl>
+      </Rows>
+    </TableBody>
+  </Table>
+</DataTable>
+```
+
+In this example:
+
+- **`<OpenControl>`** manages the open/closed state for each row and provides it via context
+- **`<ExpandButton>`** reads the state setter from context to toggle visibility
+- **`<ExpandableRow>`** reads the open state from context and conditionally renders the detail row
+- **`part="detail"`** defines a separate column layout for the expanded content
+
+This pattern leverages the micro-context architecture to share state between components without prop drilling, keeping your code clean and composable.
+
 You can even remove Table and implement your own table structure using lower-level components like `ArrayContent` and `ContentValue` from `@ctablex/core`:
 
 ```tsx
