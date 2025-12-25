@@ -572,33 +572,409 @@ Renders `<th>el child</th>` and ignores `children`. The `el` prop's children tak
 
 **Note:** Avoid passing children to the `el` prop. Use `<HeaderCell>`'s children instead to maintain clarity and expected behavior.
 
-
 ## TableBody
-<!-- render tbody -->
-<!-- default children <Rows> -->
-<!-- accept el prop to customize tbody element -->
+
+Renders the `<tbody>` element for the table body. It has default children `<Rows />`, but you can customize by providing your own children.
+
+The element that `<TableBody>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<tbody>` element is rendered.
+
 ### Examples
+
+**Basic usage:**
+
+```tsx
+<TableBody />
+```
+
+This is the same as:
+
+```tsx
+<TableBody>
+  <Rows />
+</TableBody>
+```
+
+**Customizing tbody element:**
+
+```tsx
+<TableBody el={<tbody className="my-body" />} />
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  tbody: <tbody className="app-body" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <TableBody />
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ tbody: <tbody className="app-body" /> }}>
+  <TableBody el={<tbody className="my-body" />} />
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered tbody will have the class `my-body`.
+
+**Replacing tbody with a different element:**
+
+```tsx
+<TableBody el={<div className="body-section" />} />
+```
+
+Renders a `<div>` with class `body-section` instead of a `<tbody>`.
+
+**Custom body structure:**
+
+```tsx
+<TableBody>
+  <Rows />
+  <tr>
+    <td colSpan={3}>Custom summary row</td>
+  </tr>
+</TableBody>
+```
+
+You can provide custom content in addition to or instead of `<Rows />`.
+
+**Warning about `el` children:**
+
+```tsx
+<TableBody el={<tbody>el child</tbody>}>children</TableBody>
+```
+
+Renders `<tbody>el child</tbody>` and ignores `children`. The `el` prop's children take precedence over `<TableBody>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<TableBody>`'s children instead to maintain clarity and expected behavior.
 
 ## Rows
-<!-- do not render dom it self -->
-<!-- default children is <Row> -->
-<!-- with help of <ArrayContent> from @ctablex/core iterates over items -->
-<!-- accept keyAccessor to extract react key -->
+
+Iterates over data items and renders a row for each item. This component does not render any DOM elements itself.
+
+It has default children `<Row />` which is rendered for each item in the data array. You can customize by providing your own children.
+
+The component uses `<ArrayContent>` from `@ctablex/core` to iterate over items from content context. It also accepts a `keyAccessor` prop to extract React keys from each item. If not provided, the array index is used as the key.
+
 ### Examples
+
+**Basic usage:**
+
+```tsx
+<Rows />
+```
+
+This is the same as:
+
+```tsx
+<Rows>
+  <Row />
+</Rows>
+```
+
+Renders a `<Row />` for each item in the data array from content context.
+
+**Using keyAccessor:**
+
+```tsx
+<Rows keyAccessor="id" />
+```
+
+Extracts the `id` property from each data item to use as the React key. This is recommended for better performance and avoiding reconciliation issues.
+
+**Custom row components:**
+
+```tsx
+<Rows>
+  <Row el={<tr className="data-row" />} />
+</Rows>
+```
+
+You can customize the row component that gets rendered for each item.
+
+**Multiple row types:**
+
+```tsx
+<Rows>
+  <Row />
+  <Row el={<tr className="detail-row" />}>
+    <td colSpan={3}>
+      <Columns part="detail" />
+    </td>
+  </Row>
+</Rows>
+```
+
+Renders multiple rows for each data item. This is useful for master-detail patterns.
+
 ## Row
-<!-- default children <Columns> -->
-<!-- render tr -->
-<!-- accept el prop to customize tr element -->
-<!-- by default read data from content context -->
-<!-- it can be overridden by row prop. if row prop is provided, row will be provided as content context for children -->
+
+Renders the `<tr>` element for a table row. It has default children `<Columns />`, but you can customize by providing your own children.
+
+The element that `<Row>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<tr>` element is rendered.
+
+By default, the component reads data from content context. This can be overridden by providing a `row` prop. If the `row` prop is provided, that data will be provided as content context for the children instead.
+
 ### Examples
+
+**Basic usage:**
+
+```tsx
+<Row />
+```
+
+This is the same as:
+
+```tsx
+<Row>
+  <Columns />
+</Row>
+```
+
+**Customizing tr element:**
+
+```tsx
+<Row el={<tr className="my-row" />} />
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  tr: <tr className="app-row" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <Row />
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ tr: <tr className="app-row" /> }}>
+  <Row el={<tr className="my-row" />} />
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered tr will have the class `my-row`.
+
+**Overriding row data:**
+
+```tsx
+<Row row={customData}>
+  <Columns />
+</Row>
+```
+
+Provides `customData` to children via content context instead of the data from parent context. This is useful for special rows like summaries.
+
+**Custom row content:**
+
+```tsx
+<Row>
+  <td>Custom</td>
+  <Columns />
+  <td>Actions</td>
+</Row>
+```
+
+You can mix custom cells with column-based cells.
+
+**Replacing tr with a different element:**
+
+```tsx
+<Row el={<div className="row" />} />
+```
+
+Renders a `<div>` with class `row` instead of a `<tr>`.
+
+**Warning about `el` children:**
+
+```tsx
+<Row el={<tr>el child</tr>}>children</Row>
+```
+
+Renders `<tr>el child</tr>` and ignores `children`. The `el` prop's children take precedence over `<Row>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<Row>`'s children instead to maintain clarity and expected behavior.
+
 ## Cell
-<!-- render td -->
-<!-- accept accessor to read data from content context -->
-<!-- accept el prop to customize td element -->
-<!-- read content from content context and extract value by accessor and provided it via content context again -->
-<!-- most of the time not used directly, it renders by <Column> -->
-<!-- accessor, el and children passed to <Cell> from <Column> -->
-<!-- no default children itself, but <Column> has default children <DefaultContent/> -->
-<!-- if accessor is undefined, content context is passed as is -->
+
+Renders the `<td>` element for table data cells. This component does not have default children.
+
+The element that `<Cell>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<td>` element is rendered.
+
+The component accepts an `accessor` prop to read data from content context. It extracts the value using the accessor and provides it via content context to its children. If the `accessor` is undefined, the content context is passed as is without extraction.
+
+**Note:** Most of the time, this component is not used directly. Instead, it is rendered by the `<Column>` component when outside a header context. The `accessor`, `el`, and `children` props of `<Column>` are passed to `<Cell>`. While `<Cell>` itself has no default children, `<Column>` provides `<DefaultContent />` as default children.
+
+**Note:** `el` prop renders inside the extracted content by `accessor`. so if your custom `el` wants to change based on the content, extracted content is return by `useContent()` hook. If you want access to item, omit `accessor` and use `<ContentValue />` for children. 
+
 ### Examples
+
+**Basic usage:**
+
+```tsx
+<Cell accessor="name">
+  <DefaultContent />
+</Cell>
+```
+
+Reads the `name` property from content context and provides it to children.
+
+**Typical usage via Column:**
+
+```tsx
+<TableBody>
+  <Rows>
+    <Row>
+      <Column accessor="name" header="Name" />
+    </Row>
+  </Rows>
+</TableBody>
+```
+
+The `<Column>` component internally renders `<Cell>` when outside header context.
+
+**Customizing td element:**
+
+```tsx
+<Cell accessor="price" el={<td className="my-cell" />}>
+  <DefaultContent />
+</Cell>
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  td: <td className="app-cell" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <Cell accessor="name">
+    <DefaultContent />
+  </Cell>
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ td: <td className="app-cell" /> }}>
+  <Cell accessor="price" el={<td className="my-cell" />}>
+    <DefaultContent />
+  </Cell>
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered td will have the class `my-cell`.
+
+**No accessor (pass through):**
+
+```tsx
+<Cell>
+  <CustomComponent />
+</Cell>
+```
+
+Without an `accessor`, the entire content context is passed to children unchanged. Useful when you want full control over the cell content.
+
+**Custom cell content:**
+
+```tsx
+<Cell accessor="status">
+  <StatusBadge />
+</Cell>
+```
+
+Provide custom components to render the cell content in a specific way.
+
+**Nested accessors:**
+
+```tsx
+<Cell accessor="user.name">
+  <DefaultContent />
+</Cell>
+```
+
+Access nested properties using dot notation.
+
+**Replacing td with a different element:**
+
+```tsx
+<Cell accessor="name" el={<div className="cell" />}>
+  <DefaultContent />
+</Cell>
+```
+
+Renders a `<div>` with class `cell` instead of a `<td>`.
+
+**el accessing content:**
+
+```tsx
+function ColoredTd() {
+  const content = useContent();
+  const color = content === 'Active' ? 'green' : 'red';
+  return <td style={{ color }}>{content}</td>;
+}
+```
+
+```tsx
+<Cell el={<ColoredTd />}>
+<ContentValue accessor="name">
+  <DefaultContent />
+</ContentValue>
+</Cell>
+```
+
+**Warning about `el` children:**
+
+```tsx
+<Cell accessor="name" el={<td>el child</td>}>
+  children
+</Cell>
+```
+
+Renders `<td>el child</td>` and ignores `children`. The `el` prop's children take precedence over `<Cell>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<Cell>`'s children instead to maintain clarity and expected behavior.
