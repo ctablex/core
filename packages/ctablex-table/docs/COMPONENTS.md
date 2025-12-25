@@ -276,3 +276,95 @@ Renders a `<div>` with class `grid` instead of a `<table>`.
 Renders `<div>el child</div>` and ignores `children`. The `el` prop's children take precedence over `<Table>`'s children.
 
 **Note:** Avoid passing children to the `el` prop. Use `<Table>`'s children instead to maintain clarity and expected behavior.
+
+## TableHeader
+
+Renders the `<thead>` element. It has default children `<HeaderRow />`, but you can customize by providing your own children.
+
+The element that `<TableHeader>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<thead>` element is rendered.
+
+The component also provides header context (`IsHeaderContext` set to `true`) which is used by `<Column>` components to determine whether they should render as header cells (`<th>`) or data cells (`<td>`).
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<TableHeader />
+```
+
+This is the same as:
+
+```tsx
+<TableHeader>
+  <HeaderRow />
+</TableHeader>
+```
+
+**Customizing header structure:**
+
+```tsx
+<TableHeader>
+  <HeaderRow />
+  <HeaderRow />
+</TableHeader>
+```
+
+You can provide multiple header rows or other custom structure.
+
+**Customizing thead element:**
+
+```tsx
+<TableHeader el={<thead className="my-header" />} />
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  thead: <thead className="app-header" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <TableHeader />
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ thead: <thead className="app-header" /> }}>
+  <TableHeader el={<thead className="my-header" />} />
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered thead will have the class `my-header`.
+
+**Replacing thead with a different element:**
+
+```tsx
+<TableHeader el={<div className="header-section" />} />
+```
+
+Renders a `<div>` with class `header-section` instead of a `<thead>`.
+
+**Warning about `el` children:**
+
+```tsx
+<TableHeader el={<thead>el child</thead>}>children</TableHeader>
+```
+
+Renders `<thead>el child</thead>` and ignores `children`. The `el` prop's children take precedence over `<TableHeader>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<TableHeader>`'s children instead to maintain clarity and expected behavior.
