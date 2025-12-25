@@ -5,16 +5,17 @@ Complete reference for all components in **@ctablex/table**.
 ## Table of Contents
 
 - [DataTable](#datatable)
+- [Columns](#columns)
+- [Column](#column)
 - [Table](#table)
 - [TableHeader](#tableheader)
 - [HeaderRow](#headerrow)
 - [HeaderCell](#headercell)
 - [TableBody](#tablebody)
-- [TableFooter](#tablefooter)
-- [Columns](#columns)
-- [Column](#column)
 - [Rows](#rows)
 - [Row](#row)
+- [Cell](#cell)
+- [TableFooter](#tablefooter)
 - [Re-exported Components](#re-exported-components)
 
 ---
