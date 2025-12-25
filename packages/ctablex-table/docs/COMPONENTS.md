@@ -87,6 +87,18 @@ No `data` prop needed—uses the existing data from content context.
 
 The `data` prop takes precedence. Children receive `inner` instead of `outer`.
 
+**Using with data fetching components:**
+
+A good practice is to fetch and provide data via content context in a component
+
+```tsx
+<UserDataProvider>
+  <DataTable>{/* Children */}</DataTable>
+</UserDataProvider>
+```
+
+UserDataProvider fetches user data and provides it via content context. `<DataTable>` consumes this data without needing a `data` prop. In this way no data prop is passed to any of the table components and whole component tree is constant.
+
 **Custom column container components:**
 
 ```tsx
