@@ -22,6 +22,12 @@ export type { RowsProps } from './table/rows';
 export { Column } from './columns/column';
 export type { ColumnProps } from './columns/column';
 
+export { Cell } from './table/cell';
+export type { CellProps } from './table/cell';
+
+export { HeaderCell } from './table/header-cell';
+export type { HeaderCellProps } from './table/header-cell';
+
 export { Columns } from './columns/columns';
 export type { ColumnsProps } from './columns/columns';
 
