@@ -132,6 +132,39 @@ It also accepts a `part` prop to identify different column groups. When a `part`
 
 ### Examples
 
+**Common usage scenario:**
+
+```tsx
+<DataTable data={data}>
+  <Columns>
+    <Column accessor="id" header="ID" />
+    <Column accessor="name" header="Name" />
+  </Columns>
+  <Table />
+</DataTable>
+```
+
+The `<Columns>` component is extracted by `<DataTable>`, and the column definitions are provided to `<Table>` via columns context. `<Table />` expands to its default children:
+
+```tsx
+<Table>
+  <TableHeader>
+    <HeaderRow>
+      <Columns />
+    </HeaderRow>
+  </TableHeader>
+  <TableBody>
+    <Rows>
+      <Row>
+        <Columns />
+      </Row>
+    </Rows>
+  </TableBody>
+</Table>
+```
+
+When `<Columns />` is rendered in different contexts (header vs body), it outputs the same column definitions. This allows you to define columns once and use them in multiple places.
+
 **Basic usage:**
 
 ```tsx
