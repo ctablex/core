@@ -209,6 +209,8 @@ The Column renders a `<Cell>` component (`<td>` element) and passes the `accesso
 </Cell>
 ```
 
+<!-- default children of Column is <DefaultContent /> -->
+
 ## Table
 
 Renders the `<table>` element and its structure. It has default children `<TableHeader>` and `<TableBody>`, but you can customize the structure by providing your own children.
@@ -569,3 +571,34 @@ Renders a `<div>` with class `header-cell` instead of a `<th>`.
 Renders `<th>el child</th>` and ignores `children`. The `el` prop's children take precedence over `<HeaderCell>`'s children.
 
 **Note:** Avoid passing children to the `el` prop. Use `<HeaderCell>`'s children instead to maintain clarity and expected behavior.
+
+
+## TableBody
+<!-- render tbody -->
+<!-- default children <Rows> -->
+<!-- accept el prop to customize tbody element -->
+### Examples
+
+## Rows
+<!-- do not render dom it self -->
+<!-- default children is <Row> -->
+<!-- with help of <ArrayContent> from @ctablex/core iterates over items -->
+<!-- accept keyAccessor to extract react key -->
+### Examples
+## Row
+<!-- default children <Columns> -->
+<!-- render tr -->
+<!-- accept el prop to customize tr element -->
+<!-- by default read data from content context -->
+<!-- it can be overridden by row prop. if row prop is provided, row will be provided as content context for children -->
+### Examples
+## Cell
+<!-- render td -->
+<!-- accept accessor to read data from content context -->
+<!-- accept el prop to customize td element -->
+<!-- read content from content context and extract value by accessor and provided it via content context again -->
+<!-- most of the time not used directly, it renders by <Column> -->
+<!-- accessor, el and children passed to <Cell> from <Column> -->
+<!-- no default children itself, but <Column> has default children <DefaultContent/> -->
+<!-- if accessor is undefined, content context is passed as is -->
+### Examples
