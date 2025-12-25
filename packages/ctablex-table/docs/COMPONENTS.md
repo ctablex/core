@@ -89,7 +89,7 @@ The `data` prop takes precedence. Children receive `inner` instead of `outer`.
 
 **Using with data fetching components:**
 
-A good practice is to fetch and provide data via content context in a component
+A recommended pattern is to fetch and provide data via content context in a separate component:
 
 ```tsx
 <UserDataProvider>
@@ -97,7 +97,7 @@ A good practice is to fetch and provide data via content context in a component
 </UserDataProvider>
 ```
 
-UserDataProvider fetches user data and provides it via content context. `<DataTable>` consumes this data without needing a `data` prop. In this way no data prop is passed to any of the table components and whole component tree is constant.
+`<UserDataProvider />` fetches user data and provides it via content context. `<DataTable>` consumes this data without needing a `data` prop. This approach keeps the component tree constant, as no data prop is passed down, which can improve performance and simplify component composition.
 
 **Custom column container components:**
 
