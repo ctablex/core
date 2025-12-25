@@ -8,6 +8,7 @@ Complete reference for all components in **@ctablex/table**.
 - [Table](#table)
 - [TableHeader](#tableheader)
 - [HeaderRow](#headerrow)
+- [HeaderCell](#headercell)
 - [TableBody](#tablebody)
 - [TableFooter](#tablefooter)
 - [Columns](#columns)
@@ -184,6 +185,28 @@ The first `<Columns />` renders the default definition, while `<Columns part="de
     <span>in Detail</span>
   </div>
 </div>
+```
+
+## Column
+
+The Column component behaves differently depending on its rendering context. This dual behavior helps keep header and data cell definitions together in one place.
+
+**Inside a header context** (e.g., within `<TableHeader>`):
+
+The Column renders a `<HeaderCell>` component (`<th>` element) and passes the `header` prop as its children. It also passes the `thEl` prop to the HeaderCell as the `el` prop.
+
+```tsx
+<HeaderCell el={props.thEl}>{props.header}</HeaderCell>
+```
+
+**Outside a header context** (e.g., within `<TableBody>`):
+
+The Column renders a `<Cell>` component (`<td>` element) and passes the `accessor` prop to Cell as the data accessor. It also passes the `el` prop to Cell as the `el` prop.
+
+```tsx
+<Cell accessor={props.accessor} el={props.el}>
+  {children}
+</Cell>
 ```
 
 ## Table
@@ -460,6 +483,89 @@ Renders `<tr>el child</tr>` and ignores `children`. The `el` prop's children tak
 
 **Note:** Avoid passing children to the `el` prop. Use `<HeaderRow>`'s children instead to maintain clarity and expected behavior.
 
-## Column inside header
+## HeaderCell
 
-Columns accept two prop, `header` and `accessor`. when header is render inside the header context (i.e. inside TableHeader), it renders the `header` prop as the content of the header cell.
+Renders the `<th>` element for table headers. This component does not have default children.
+
+The element that `<HeaderCell>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<th>` element is rendered.
+
+**Note:** Most of the time, this component is not used directly. Instead, it is rendered by the `<Column>` component when inside a header context (e.g., within `<TableHeader>`). `header` and `thEl` props of `<Column>` are passed to `<HeaderCell>` as children and `el` respectively.
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<HeaderCell>Name</HeaderCell>
+```
+
+Renders a simple header cell with text content.
+
+**Typical usage via Column:**
+
+```tsx
+<TableHeader>
+  <HeaderRow>
+    <Column header="Name" accessor="name" />
+  </HeaderRow>
+</TableHeader>
+```
+
+The `<Column>` component internally renders `<HeaderCell>` when in header context. This is the recommended approach.
+
+**Customizing th element:**
+
+```tsx
+<HeaderCell el={<th className="my-header-cell" />}>Name</HeaderCell>
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  th: <th className="app-header-cell" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <HeaderCell>Name</HeaderCell>
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ th: <th className="app-header-cell" /> }}>
+  <HeaderCell el={<th className="my-header-cell" />}>Name</HeaderCell>
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered th will have the class `my-header-cell`.
+
+**Replacing th with a different element:**
+
+```tsx
+<HeaderCell el={<div className="header-cell" />}>Name</HeaderCell>
+```
+
+Renders a `<div>` with class `header-cell` instead of a `<th>`.
+
+**Warning about `el` children:**
+
+```tsx
+<HeaderCell el={<th>el child</th>}>children</HeaderCell>
+```
+
+Renders `<th>el child</th>` and ignores `children`. The `el` prop's children take precedence over `<HeaderCell>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<HeaderCell>`'s children instead to maintain clarity and expected behavior.
