@@ -7,6 +7,7 @@ Complete reference for all components in **@ctablex/table**.
 - [DataTable](#datatable)
 - [Table](#table)
 - [TableHeader](#tableheader)
+- [HeaderRow](#headerrow)
 - [TableBody](#tablebody)
 - [TableFooter](#tablefooter)
 - [Columns](#columns)
@@ -368,3 +369,93 @@ Renders a `<div>` with class `header-section` instead of a `<thead>`.
 Renders `<thead>el child</thead>` and ignores `children`. The `el` prop's children take precedence over `<TableHeader>`'s children.
 
 **Note:** Avoid passing children to the `el` prop. Use `<TableHeader>`'s children instead to maintain clarity and expected behavior.
+
+## HeaderRow
+
+Renders the `<tr>` element for the header row. It has default children `<Columns />`, but you can customize by providing your own children.
+
+The element that `<HeaderRow>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<tr>` element is rendered.
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<HeaderRow />
+```
+
+This is the same as:
+
+```tsx
+<HeaderRow>
+  <Columns />
+</HeaderRow>
+```
+
+**Customizing header row content:**
+
+```tsx
+<HeaderRow>
+  <th>ID</th>
+  <th>Name</th>
+</HeaderRow>
+```
+
+You can provide custom content or use specific column parts.
+
+**Customizing tr element:**
+
+```tsx
+<HeaderRow el={<tr className="my-header-row" />} />
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  tr: <tr className="app-row" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <HeaderRow />
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ tr: <tr className="app-row" /> }}>
+  <HeaderRow el={<tr className="my-header-row" />} />
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered tr will have the class `my-header-row`.
+
+**Replacing tr with a different element:**
+
+```tsx
+<HeaderRow el={<div className="header-row" />} />
+```
+
+Renders a `<div>` with class `header-row` instead of a `<tr>`.
+
+**Warning about `el` children:**
+
+```tsx
+<HeaderRow el={<tr>el child</tr>}>children</HeaderRow>
+```
+
+Renders `<tr>el child</tr>` and ignores `children`. The `el` prop's children take precedence over `<HeaderRow>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<HeaderRow>`'s children instead to maintain clarity and expected behavior.
