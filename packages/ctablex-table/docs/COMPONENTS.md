@@ -840,7 +840,7 @@ The component accepts an `accessor` prop to read data from content context. It e
 
 **Note:** Most of the time, this component is not used directly. Instead, it is rendered by the `<Column>` component when outside a header context. The `accessor`, `el`, and `children` props of `<Column>` are passed to `<Cell>`. While `<Cell>` itself has no default children, `<Column>` provides `<DefaultContent />` as default children.
 
-**Note:** `el` prop renders inside the extracted content by `accessor`. so if your custom `el` wants to change based on the content, extracted content is return by `useContent()` hook. If you want access to item, omit `accessor` and use `<ContentValue />` for children. 
+**Note:** The `el` prop renders inside the content extracted by `accessor`. This means custom element components can access the extracted value via `useContent()`. If you need access to the entire item instead of just the extracted value, omit the `accessor` prop and use `<ContentValue />` with its own `accessor` in the children.
 
 ### Examples
 
@@ -949,7 +949,7 @@ Access nested properties using dot notation.
 
 Renders a `<div>` with class `cell` instead of a `<td>`.
 
-**el accessing content:**
+**el accessing extracted content:**
 
 ```tsx
 function ColoredTd() {
@@ -960,12 +960,32 @@ function ColoredTd() {
 ```
 
 ```tsx
-<Cell el={<ColoredTd />}>
-<ContentValue accessor="name">
+<Cell accessor="status" el={<ColoredTd />}>
   <DefaultContent />
-</ContentValue>
 </Cell>
 ```
+
+The custom `ColoredTd` component receives the extracted `status` value via `useContent()` and applies conditional styling.
+
+**el accessing full item:**
+
+```tsx
+function StatusTd(props: Props) {
+  const item = useContent();
+  const color = item.status === 'Active' ? 'green' : 'red';
+  return <td style={{ color }}>{props.children}</td>;
+}
+```
+
+```tsx
+<Cell el={<StatusTd />}>
+  <ContentValue accessor="name">
+    <DefaultContent />
+  </ContentValue>
+</Cell>
+```
+
+Without an `accessor` on `<Cell>`, the custom element receives the full item and can access multiple properties.
 
 **Warning about `el` children:**
 
@@ -978,3 +998,100 @@ function ColoredTd() {
 Renders `<td>el child</td>` and ignores `children`. The `el` prop's children take precedence over `<Cell>`'s children.
 
 **Note:** Avoid passing children to the `el` prop. Use `<Cell>`'s children instead to maintain clarity and expected behavior.
+
+## TableFooter
+
+Renders the `<tfoot>` element for the table footer. It does not have default children.
+
+The element that `<TableFooter>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<tfoot>` element is rendered.
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<TableFooter>
+  <tr>
+    <td colSpan={3}>Footer content</td>
+  </tr>
+</TableFooter>
+```
+
+**Customizing tfoot element:**
+
+```tsx
+<TableFooter el={<tfoot className="my-footer" />}>
+  <tr>
+    <td colSpan={3}>Footer content</td>
+  </tr>
+</TableFooter>
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  tfoot: <tfoot className="app-footer" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <TableFooter>
+    <tr>
+      <td colSpan={3}>Footer content</td>
+    </tr>
+  </TableFooter>
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ tfoot: <tfoot className="app-footer" /> }}>
+  <TableFooter el={<tfoot className="my-footer" />}>
+    <tr>
+      <td colSpan={3}>Footer content</td>
+    </tr>
+  </TableFooter>
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered tfoot will have the class `my-footer`.
+
+**Replacing tfoot with a different element:**
+
+```tsx
+<TableFooter el={<div className="footer-section" />}>
+  <span>Footer content</span>
+</TableFooter>
+```
+
+Renders a `<div>` with class `footer-section` instead of a `<tfoot>`.
+
+**Warning about `el` children:**
+
+```tsx
+<TableFooter el={<tfoot>el child</tfoot>}>children</TableFooter>
+```
+
+Renders `<tfoot>el child</tfoot>` and ignores `children`. The `el` prop's children take precedence over `<TableFooter>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<TableFooter>`'s children instead to maintain clarity and expected behavior.
+
+## Re-exported Components
+
+Some components are re-exported from `@ctablex/core` for convenience.
+
+- [DefaultContent](./COMPONENTS.md#defaultcontent)
+- [NullContent](./COMPONENTS.md#nullcontent)
+- [ContentValue](./COMPONENTS.md#contentvalue)
