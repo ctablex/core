@@ -459,3 +459,7 @@ Renders a `<div>` with class `header-row` instead of a `<tr>`.
 Renders `<tr>el child</tr>` and ignores `children`. The `el` prop's children take precedence over `<HeaderRow>`'s children.
 
 **Note:** Avoid passing children to the `el` prop. Use `<HeaderRow>`'s children instead to maintain clarity and expected behavior.
+
+## Column inside header
+
+Columns accept two prop, `header` and `accessor`. when header is render inside the header context (i.e. inside TableHeader), it renders the `header` prop as the content of the header cell.
