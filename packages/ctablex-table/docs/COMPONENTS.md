@@ -1,0 +1,278 @@
+# Components API Reference
+
+Complete reference for all components in **@ctablex/table**.
+
+## Table of Contents
+
+- [DataTable](#datatable)
+- [Table](#table)
+- [TableHeader](#tableheader)
+- [TableBody](#tablebody)
+- [TableFooter](#tablefooter)
+- [Columns](#columns)
+- [Column](#column)
+- [Rows](#rows)
+- [Row](#row)
+- [Re-exported Components](#re-exported-components)
+
+---
+
+## DataTable
+
+The root component that extracts and provides column definitions and data to the table.
+It serves two main purposes:
+
+- Extract column definitions from `<Columns>` components and provide them via columns context
+- Provide data to the table via content context
+
+### Behavior
+
+This component does not render any DOM elements itself.
+
+First, it extracts column definitions from its immediate children, typically `<Columns>` components. Any component can be marked as a definition by setting the `__COLUMNS__` static property to `true` on its type.
+
+Next, it optionally accepts a `data` prop and provides it via content context. If the `data` prop is not provided but content context already contains data, it uses the existing data. If neither is available, it throws an error.
+
+Finally, it renders its children with definition components removed from the tree.
+
+### Examples
+
+**Extracting column definitions:**
+
+```tsx
+<DataTable data={data}>
+  <Columns>Columns definition...</Columns>
+  <div>Other children...</div>
+</DataTable>
+```
+
+The `<Columns>` component is extracted and removed from the render tree. Only `<div>Other children...</div>` is rendered.
+
+**Error case - no data available:**
+
+```tsx
+<DataTable>{/* Children */}</DataTable>
+```
+
+Throws an error because neither `data` prop nor content context provides data.
+
+**Basic usage with data prop:**
+
+```tsx
+<DataTable data={data}>{/* Children */}</DataTable>
+```
+
+Provides `data` to children via content context.
+
+**Using existing content context:**
+
+```tsx
+<ContentProvider value={data}>
+  <DataTable>{/* Children */}</DataTable>
+</ContentProvider>
+```
+
+No `data` prop needed—uses the existing data from content context.
+
+**Data prop overrides context:**
+
+```tsx
+<ContentProvider value={outer}>
+  <DataTable data={inner}>{/* Children */}</DataTable>
+</ContentProvider>
+```
+
+The `data` prop takes precedence. Children receive `inner` instead of `outer`.
+
+**Custom column container components:**
+
+```tsx
+function MyColumns() {
+  return (
+    <>
+      <Column accessor="name" header="Name" />
+      <Column accessor="age" header="Age" />
+    </>
+  );
+}
+MyColumns.__COLUMNS__ = true; // Mark as column container
+```
+
+You can create reusable column definition components by marking them with `__COLUMNS__ = true`.
+
+```tsx
+<DataTable data={items}>
+  <MyColumns />
+</DataTable>
+```
+
+`<MyColumns />` is extracted and removed from the render tree because it's marked as a column container.
+
+**Non-immediate children are not extracted:**
+
+```tsx
+<DataTable data={items}>
+  <>
+    <Columns>{/* ... */}</Columns>
+  </>
+</DataTable>
+```
+
+The `<Columns>` component is wrapped in a fragment, so it's not an immediate child. It will be rendered instead of being extracted. Read more about this behavior in the [Columns](./COMPONENTS.md#columns) documentation.
+
+## Columns
+
+Container for column definitions. It is marked as a column definition by setting the `__COLUMNS__` static property to `true` on its type and is extracted by `<DataTable>` when it is an immediate child.
+
+When it is not an immediate child of `<DataTable>`, it will be rendered. It does not render any DOM elements itself and does not render its own children. Instead, it renders children provided by `<DataTable>` via columns context.
+
+It also accepts a `part` prop to identify different column groups. When a `part` prop is provided, it renders only the children of the matching part from columns context. If more than one `<Columns>` with the same `part` exists, all definitions are rendered.
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<DataTable data={data}>
+  <Columns>
+    <span>in Columns</span>
+  </Columns>
+  <div>
+    <span>outside Columns</span>
+    <Columns />
+  </div>
+</DataTable>
+```
+
+The `<Columns>` definition is extracted by `<DataTable>`. When rendered inside the `<div>`, it outputs its defined children:
+
+```html
+<div>
+  <span>outside Columns</span>
+  <span>in Columns</span>
+</div>
+```
+
+**Using the `part` prop:**
+
+```tsx
+<DataTable data={data}>
+  <Columns>
+    <span>no part</span>
+  </Columns>
+  <Columns part="detail">
+    <span>in Detail</span>
+  </Columns>
+  <div>
+    <span>outside Columns</span>
+    <Columns />
+    <div class="detail">
+      <Columns part="detail" />
+    </div>
+  </div>
+</DataTable>
+```
+
+The first `<Columns />` renders the default definition, while `<Columns part="detail" />` renders the matching part:
+
+```html
+<div>
+  <span>outside Columns</span>
+  <span>no part</span>
+  <div class="detail">
+    <span>in Detail</span>
+  </div>
+</div>
+```
+
+## Table
+
+Renders the `<table>` element and its structure. It has default children `<TableHeader>` and `<TableBody>`, but you can customize the structure by providing your own children.
+
+The element that `<Table>` renders can be customized via table element context or the `el` prop:
+
+- If the `el` prop is provided, it is used to render the element.
+- If table element context provides a value, it is used to render the element.
+- Otherwise, a default `<table>` element is rendered.
+
+### Examples
+
+**Basic usage:**
+
+```tsx
+<Table />
+```
+
+This is the same as:
+
+```tsx
+<Table>
+  <TableHeader />
+  <TableBody />
+</Table>
+```
+
+**Customizing table structure:**
+
+```tsx
+<Table>
+  <TableHeader />
+  <TableBody />
+  <TableFooter />
+</Table>
+```
+
+You can override the default children to add additional sections like a footer.
+
+**Customizing table element:**
+
+```tsx
+<Table el={<table className="my-table" />} />
+```
+
+Use the `el` prop to customize the rendered element with your own props like className.
+
+**Using table element context:**
+
+```tsx
+const elements = {
+  table: <table className="app-table" />,
+  // other elements...
+};
+```
+
+```tsx
+<TableElementProvider value={elements}>
+  <Table />
+</TableElementProvider>
+```
+
+Provide custom elements via context to apply styling consistently across all table components.
+
+**Combining `el` prop and context:**
+
+```tsx
+<TableElementProvider value={{ table: <table className="app-table" /> }}>
+  <Table el={<table className="my-table" />} />
+</TableElementProvider>
+```
+
+The `el` prop takes precedence over context. The rendered table will have the class `my-table`.
+
+**Replacing table with a different element:**
+
+```tsx
+<Table el={<div className="grid" />} />
+```
+
+Renders a `<div>` with class `grid` instead of a `<table>`.
+
+**Warning about `el` children:**
+
+```tsx
+<Table el={<div>el child</div>}>children</Table>
+```
+
+Renders `<div>el child</div>` and ignores `children`. The `el` prop's children take precedence over `<Table>`'s children.
+
+**Note:** Avoid passing children to the `el` prop. Use `<Table>`'s children instead to maintain clarity and expected behavior.
