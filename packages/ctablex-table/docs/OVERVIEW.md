@@ -5,6 +5,7 @@ This document provides an example and shows how it works, then step by step show
 ## TL;DR
 
 - **Basic example and component expansion**: See how a simple `<Table />` component automatically expands into `<TableHeader />`, `<TableBody />`, rows, and cells through default children
+- **Data providing patterns**: Learn three ways to provide data to the table—via `data` prop, content context, or data provider components
 - **Customize cell content**: Learn to create custom content components like `NumberContent` that read from context and format data your way
 - **Customize elements**: Discover how to swap default HTML elements using `TableElementsProvider` or the `el` prop to match your design system
 - **Customize structure**: Explore techniques for changing table structure—add footers, remove headers, render multiple rows per item, or replace the table entirely with custom layouts
@@ -167,7 +168,7 @@ TableHeader provides IsHeaderContext (set to true). Column reads IsHeaderContext
 
 ### Step 4: TableBody
 
-TableBody also has default children. It expands to DataRows:
+TableBody also has default children. It expands to Rows:
 
 ```tsx
 <DataTable data={products}>
@@ -331,11 +332,51 @@ Table, TableHeader, TableBody, HeaderRow, Row, HeaderCell, Cell render appropria
 
 This results in the final rendered table as shown in the basic example.
 
+## Data Providing Patterns
+
+There are three ways to provide data to the table, each suited for different scenarios.
+
+### Using the `data` prop
+
+The simplest approach, as shown in the basic example, is to provide data directly via the `data` prop of `<DataTable>`:
+
+```tsx
+<DataTable data={products}>{/* ... */}</DataTable>
+```
+
+This works well for static data or when the data is already available in the component's scope.
+
+### Using Content Context
+
+You can also provide data via content context using `<ContentProvider>` from `@ctablex/core`:
+
+```tsx
+import { ContentProvider } from '@ctablex/core';
+
+<ContentProvider value={products}>
+  <DataTable>{/* Children */}</DataTable>
+</ContentProvider>;
+```
+
+This is useful when you want to share data between multiple components or when data is provided by a parent component.
+
+### Using Data Provider Components
+
+The recommended pattern for production applications is to provide data via content context in a dedicated data provider component. This component can fetch data, manage loading states, or handle reactive updates internally, then provide the data via content context. For example:
+
+```tsx
+<UserDataProvider>
+  <DataTable>{/* Children */}</DataTable>
+</UserDataProvider>
+```
+
+`<UserDataProvider />` fetches user data and provides it via content context. `<DataTable>` consumes this data without needing a `data` prop. This approach keeps the component tree constant, as no data prop is passed down, which can improve performance and simplify component composition. It also promotes separation of concerns—data fetching logic stays in the provider, while presentation logic stays in the table components.
+
 ## Customization
 
 ### Custom Cell Content
 
-You can customize the content of each cell by providing your own children to the `Column` component. For example, to format the price with a dollar sign:
+You can customize the content of each cell by providing your own children to the `Column` component. For example, to format the price and add a suffix:
 
 ```tsx
 <DataTable data={products}>
@@ -458,11 +499,9 @@ Or render a special row:
   <Table>
     <TableHeader />
     <TableBody>
-      <Row>
-        <tr>
-          <td colSpan={2}>Special Row</td>
-        </tr>
-      </Row>
+      <tr>
+        <td colSpan={2}>Special Row</td>
+      </tr>
       {/* default rows */}
       <Rows />
     </TableBody>
@@ -632,6 +671,7 @@ That's the tour! You've seen how `@ctablex/table` works from the ground up:
 
 - **Step-by-step transformation**: How `<Table />` expands into headers, rows, and cells through default children
 - **The micro-context magic**: Data and column definitions flow through context, so you're not passing props everywhere
+- **Three data providing patterns**: Via `data` prop, content context, or dedicated data provider components
 - **Customization levels**: From dropping in a custom content component to completely rebuilding the table structure
 - **Type safety**: Generic types on `<Column>` give you autocomplete and type checking for nested paths
 
