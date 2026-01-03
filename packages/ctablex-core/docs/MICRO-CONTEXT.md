@@ -49,6 +49,8 @@ In this example:
 - `FieldContent` extracts the specified field from the current item and provides it via context
 - `NumberContent` reads the value from context and formats it and renders formatted output
 
+### How It Works
+
 You can think about ArrayContent like this:
 
 ```tsx
@@ -100,6 +102,8 @@ function NumberContent() {
 }
 ```
 
+### Data Fetching with Micro-Context
+
 We can go one step further and fetch and provide data in a reusable component:
 
 ```tsx
@@ -116,6 +120,10 @@ We can go one step further and fetch and provide data in a reusable component:
 </ProductDataProvider>
 ```
 
-`ProductDataProvider` fetches product data and provides it via context. It encapsulates data fetching logic, so the rest of the component tree just declares who data is displayed.
+`ProductDataProvider` fetches product data and provides it via context. It encapsulates data fetching logic, so the rest of the component tree just declares how data is displayed.
 
 Notice that no data props are passed through `ProductDataProvider`, `ul`, `li`, or `NumberContent` and Component structure is completely constant and no changing props is here, only context changes. This enables powerful patterns for building flexible, composable components.
+
+### Performance Improvements
+
+Because no changing props are passed to components, Parent components do not re-render when context changes. Only the components that consume context re-render, leading to significant performance improvements in large component trees.
